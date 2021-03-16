@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.yarn-integrity
+yarn-debug.log
+yarn-error.log
+src/
+__tests__/
+coverage/
+node_modules/
+typings/
