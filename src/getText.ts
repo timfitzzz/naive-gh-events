@@ -133,9 +133,9 @@ export function renderDate(
 // prettier-ignore
 export function renderDatedContent(
   date: string,
-  content: string | null,
+  content: string | number | null,
   url: string | null,
-  title: string | null,
+  title: string | number | null,
   { md = false }: Partial<NaiveConfig> = {
     md: false,
   }
@@ -190,9 +190,9 @@ export function renderDatedContent(
 }
 
 export function renderContent(
-  content: string,
+  content: string | number,
   url: string | null,
-  title: string | null,
+  title: string | number | null,
   { md = false }: Partial<NaiveConfig> = {
     md: false,
   }

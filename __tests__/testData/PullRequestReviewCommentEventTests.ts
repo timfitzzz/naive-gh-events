@@ -26,7 +26,7 @@ PullRequestReviewCommentEventTests.testEvents.created = [
             'https://github.com/ruffle-rs/ruffle/pull/3213#discussion_r575624667',
           preposition: undefined,
           desc: undefined,
-          title: undefined,
+          title: 575624667,
           content:
             'It seems that `coerce_to_string` is necessary here as well.\r\n\r\nTest code\r\n```as\r\nimport flash.utils.ByteArray;\r\nimport flash.utils.Endian;\r\n\r\nclass A {\r\n    public function A() {}\r\n    public function toString():String {\r\n        return "shift-jis";\r\n    }\r\n}\r\n\r\nvar test = new ByteArray();\r\ntest.writeMultiByte("次", new A());\r\ntest.position = 0;\r\ntrace(test.readMultiByte(2, "shift-jis"));\r\n```\r\n\r\nFlash player prints `次`.\r\nRuffle prints `谺`.\r\n',
         },

@@ -19,7 +19,7 @@ export interface EntityProps {
   url: string | undefined;
   desc: string | undefined;
   preposition: string | undefined;
-  title: string | undefined;
+  title: string | number | undefined;
   content?: string | undefined;
 }
 
