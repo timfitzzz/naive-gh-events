@@ -4,7 +4,7 @@
 yarn-debug.log
 yarn-error.log
 dist/
-__tests__/utils/testData.json
+__tests__/utils/
 
 node_modules/
 typings/
