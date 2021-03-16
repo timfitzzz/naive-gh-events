@@ -423,3 +423,63 @@ describe('renderEvents for all event sets', () => {
     });
   });
 });
+
+describe('renderEvents for multiple commit push events', () => {
+  let multiplePushEvent = {
+    id: '15567205789',
+    type: 'PushEvent',
+    actor: {
+      id: 67528999,
+      login: 'theykay',
+      display_login: 'theykay',
+      gravatar_id: '',
+      url: 'https://api.github.com/users/theykay',
+      avatar_url: 'https://avatars.githubusercontent.com/u/67528999?',
+    },
+    repo: {
+      id: 344985892,
+      name: 'theykay/bubblegum',
+      url: 'https://api.github.com/repos/theykay/bubblegum',
+    },
+    payload: {
+      push_id: 6723541596,
+      size: 2,
+      distinct_size: 2,
+      ref: 'refs/heads/main',
+      head: '786c305bd40e2642d39c5828e41c9d080b5d2e85',
+      before: '3725c1d3491095643705e08b1f709f13be701ea3',
+      commits: [
+        {
+          sha: '1575f3330e3121267526d846492bf71f0ca00193',
+          author: { email: 'murraykyleb@gmail.com', name: 'TheyKay' },
+          message:
+            'animated dropdown menu to work on focus for xs screens and hover for everything else',
+          distinct: true,
+          url:
+            'https://api.github.com/repos/theykay/bubblegum/commits/1575f3330e3121267526d846492bf71f0ca00193',
+        },
+        {
+          sha: '786c305bd40e2642d39c5828e41c9d080b5d2e85',
+          author: { email: 'murraykyleb@gmail.com', name: 'TheyKay' },
+          message: 'added react fortawesome',
+          distinct: true,
+          url:
+            'https://api.github.com/repos/theykay/bubblegum/commits/786c305bd40e2642d39c5828e41c9d080b5d2e85',
+        },
+      ],
+    },
+    public: true,
+    created_at: '2021-03-16T20:13:28Z',
+  };
+
+  it('should return the expected md text', () => {
+    expect(
+      renderEvents([multiplePushEvent], { md: true })[0]
+        .renderedEventCollections
+    ).toStrictEqual([
+      `[theykay](https://github.com/theykay) pushed 2 commits to refs/heads/main in [theykay/bubblegum](https://github.com/theykay/bubblegum) \r\n` +
+        `* [1575f3330e3121267526d846492bf71f0ca00193](https://github.com/theykay/bubblegum/commits/1575f3330e3121267526d846492bf71f0ca00193): animated dropdown menu to work on focus for xs screens and hover for everything else \r\n` +
+        `* [786c305bd40e2642d39c5828e41c9d080b5d2e85](https://github.com/theykay/bubblegum/commits/786c305bd40e2642d39c5828e41c9d080b5d2e85): added react fortawesome \r\n\r\n`,
+    ]);
+  });
+});

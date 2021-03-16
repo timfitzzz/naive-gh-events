@@ -26,7 +26,7 @@ PushEventTests.testEvents.none = [
             'https://github.com/timfitzzz/nursefornyc/commits/d4e5d71da8b6cd7b169c090458142527eeb3c0af',
           content: 'Added Labor Unions/Sindicals to endorsement section titles',
           desc: undefined,
-          title: undefined,
+          title: 'd4e5d71da8b6cd7b169c090458142527eeb3c0af',
           preposition: undefined,
         },
         target: {
@@ -159,7 +159,7 @@ PushEventTests.testEvents.multiple = [
           id: 'd4e5d71da8b6cd7b169c090458142527eeb3c0af',
           url:
             'https://github.com/timfitzzz/nursefornyc/commits/d4e5d71da8b6cd7b169c090458142527eeb3c0af',
-          title: undefined,
+          title: 'd4e5d71da8b6cd7b169c090458142527eeb3c0af',
           desc: undefined,
           content: 'Added Labor Unions/Sindicals to endorsement section titles',
         },
@@ -193,7 +193,7 @@ PushEventTests.testEvents.multiple = [
           id: 'a0579605d2829a54f58b86a6e9b5f8a412cfa76a',
           url:
             'https://github.com/timfitzzz/nursefornyc/commits/a0579605d2829a54f58b86a6e9b5f8a412cfa76a',
-          title: undefined,
+          title: 'a0579605d2829a54f58b86a6e9b5f8a412cfa76a',
           desc: undefined,
           content:
             "Platform/en: Added intro section and finessed the 'more' arrows",
@@ -228,7 +228,7 @@ PushEventTests.testEvents.multiple = [
           id: 'b8fe3cfef2055a150b3af1c9d47911d1d0368c65',
           url:
             'https://github.com/timfitzzz/nursefornyc/commits/b8fe3cfef2055a150b3af1c9d47911d1d0368c65',
-          title: undefined,
+          title: 'b8fe3cfef2055a150b3af1c9d47911d1d0368c65',
           desc: undefined,
           content: 'Added new Endorsements',
         },
