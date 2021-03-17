@@ -27,26 +27,26 @@ kii-chan-reloaded edited 2 wiki pages in kii-chan-reloaded/GeneticChickengineeri
 ```
 
 ####Table of Contents
-1. [How it Works](#how-it-works)
-2. [Supported Event Types](#supported-event-types)
-3. [How to Install](#how-to-install)
-4. [How to Use](#how-to-use)
-5. [API](#api)
+1. [How it Works](#how-it-works) 
+2. [Supported Event Types](#supported-event-types) 
+3. [How to Install](#how-to-install) 
+4. [How to Use](#how-to-use) 
+5. [API](#api) 
 
 ## How it Works
 
 naive-gh-events takes a highly general approach to interpreting the contents of GitHub event objects. Each event type can be boiled down into several linguistic abstractions, based on various properties of the event:
 
-**actor**: the user (person or bot) whose action generates the event
-**verb**: expresses the action taken
-**result**: in general terms, the result of the action
-**subject**: the product(s) of the action
-**target**: what the action is taken upon
-**parent**: the context within which the action occurs
+**actor**: the user (person or bot) whose action generates the event 
+**verb**: expresses the action taken 
+**result**: in general terms, the result of the action 
+**subject**: the product(s) of the action 
+**target**: what the action is taken upon 
+**parent**: the context within which the action occurs 
 
 By generating event-specific language outputs, each of these can be manipulated sensitively to provide natural language summaries for single events, as well as to group events in a way that makes sense. 
 
-In addition, naive-gh-events' markdown output (default) contains urls, making it quite easy to use this library to create a custom GitHub event tracking solution using only Markdown rendering.
+In addition, naive-gh-events' markdown output (default) contains urls, making it quite easy to use this library to create a custom GitHub event tracking solution using only Markdown rendering. 
 
 In sum, this implementation provides natural language and event collation functionality already used to generate social feeds on GitHub.com, but which are not provided by existing official or semi-official GitHub API libraries. 
 
