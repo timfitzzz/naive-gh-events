@@ -95,6 +95,7 @@ export const defaultNaiveConfig: NaiveConfig = {
   collapse: true,
   groupByDays: 7,
   dateSummaries: false,
+  dateContent: false,
   startDate: new Date('1/1/1970'),
   md: true,
   omitContent: false,
