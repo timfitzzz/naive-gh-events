@@ -1,10 +1,118 @@
+import { isUndefined } from 'lodash';
 import { TypeTestData } from '../../src/types';
 
 const CreateEventTests: TypeTestData = {
   testEvents: {
     branch: [],
+    repository: [],
   },
 };
+
+CreateEventTests.testEvents.repository = [
+  {
+    propSets: [
+      {
+        date: new Date('2021-02-23T18:48:45Z'),
+        private: false,
+        type: 'CreateEvent',
+        actor: {
+          id: 'pgillan145',
+          url: 'https://github.com/pgillan145',
+        },
+        verb: 'created',
+        result: ['repository', 'repositories'],
+        actionType: 'repository',
+        subject: {
+          id: 'pgillan145/AudioPulse',
+          title: 'pgillan145/AudioPulse',
+          url: 'https://github.com/pgillan145/AudioPulse',
+          preposition: undefined,
+          desc: undefined,
+          content: undefined,
+        },
+        target: undefined,
+        parent: undefined,
+      },
+    ],
+    renderedPropSets: [
+      {
+        plain: {
+          date: 'February 23, 2021',
+          actor: 'pgillan145',
+          verb: 'created',
+          subject: 'pgillan145/AudioPulse',
+          content: undefined,
+          target: undefined,
+          parent: undefined,
+        },
+        md: {
+          date: 'February 23, 2021',
+          actor: '[pgillan145](https://github.com/pgillan145)',
+          verb: 'created',
+          subject:
+            '[pgillan145/AudioPulse](https://github.com/pgillan145/AudioPulse)',
+          content: undefined,
+          target: undefined,
+          parent: undefined,
+        },
+      },
+    ],
+    renderedEventsTextSets: {
+      collapsed: [
+        {
+          plain: [
+            ['February 23, 2021'],
+            'pgillan145 created repository pgillan145/AudioPulse',
+          ],
+          md: [
+            ['February 23, 2021'],
+            '[pgillan145](https://github.com/pgillan145) created repository [pgillan145/AudioPulse](https://github.com/pgillan145/AudioPulse)',
+          ],
+        },
+      ],
+      individual: [
+        {
+          plain: [
+            ['February 23, 2021'],
+            'pgillan145 created repository pgillan145/AudioPulse',
+          ],
+          md: [
+            ['February 23, 2021'],
+            '[pgillan145](https://github.com/pgillan145) created repository [pgillan145/AudioPulse](https://github.com/pgillan145/AudioPulse)',
+          ],
+        },
+      ],
+    },
+    events: [
+      {
+        id: '15289978092',
+        type: 'CreateEvent',
+        actor: {
+          id: 18201040,
+          login: 'pgillan145',
+          display_login: 'pgillan145',
+          gravatar_id: '',
+          url: 'https://api.github.com/users/pgillan145',
+          avatar_url: 'https://avatars.githubusercontent.com/u/18201040?',
+        },
+        repo: {
+          id: 341655928,
+          name: 'pgillan145/AudioPulse',
+          url: 'https://api.github.com/repos/pgillan145/AudioPulse',
+        },
+        payload: {
+          ref: null,
+          ref_type: 'repository',
+          master_branch: 'main',
+          description: null,
+          pusher_type: 'user',
+        },
+        public: true,
+        created_at: '2021-02-23T18:48:45Z',
+      },
+    ],
+  },
+];
 
 CreateEventTests.testEvents.branch = [
   {
@@ -14,7 +122,7 @@ CreateEventTests.testEvents.branch = [
         private: true,
         type: 'CreateEvent',
         verb: 'created',
-        result: ['a branch', 'branches'],
+        result: ['branch', 'branches'],
         actionType: 'branch',
         subject: {
           id: 'newPlatformDesign',
@@ -67,11 +175,11 @@ CreateEventTests.testEvents.branch = [
         {
           plain: [
             ['January 25, 2021'],
-            'timfitzzz created a branch newPlatformDesign in timfitzzz/nursefornyc',
+            'timfitzzz created branch newPlatformDesign in timfitzzz/nursefornyc',
           ],
           md: [
             ['January 25, 2021'],
-            '[timfitzzz](https://github.com/timfitzzz) created a branch newPlatformDesign in [timfitzzz/nursefornyc](https://github.com/timfitzzz/nursefornyc)',
+            '[timfitzzz](https://github.com/timfitzzz) created branch newPlatformDesign in [timfitzzz/nursefornyc](https://github.com/timfitzzz/nursefornyc)',
           ],
         },
       ],
@@ -79,11 +187,11 @@ CreateEventTests.testEvents.branch = [
         {
           plain: [
             ['January 25, 2021'],
-            'timfitzzz created a branch newPlatformDesign in timfitzzz/nursefornyc',
+            'timfitzzz created branch newPlatformDesign in timfitzzz/nursefornyc',
           ],
           md: [
             ['January 25, 2021'],
-            '[timfitzzz](https://github.com/timfitzzz) created a branch newPlatformDesign in [timfitzzz/nursefornyc](https://github.com/timfitzzz/nursefornyc)',
+            '[timfitzzz](https://github.com/timfitzzz) created branch newPlatformDesign in [timfitzzz/nursefornyc](https://github.com/timfitzzz/nursefornyc)',
           ],
         },
       ],

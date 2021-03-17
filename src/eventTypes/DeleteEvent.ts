@@ -1,37 +1,45 @@
-import { GithubEventType } from "./helperTypes"
+import { GithubEventType, repoParentPaths } from './helperTypes';
 
 const DeleteEvent: GithubEventType = {
   config: {
-    actionPropPath: "payload.ref_type",
-    actionTypes: ["branch", "tag", "repository"],
+    actionPropPath: 'payload.ref_type',
+    actionTypes: ['branch', 'tag', 'repository'],
   },
   paths: {
     actor: {
-      id: "actor.login",
-      url: "actor.url",
+      id: 'actor.login',
+      url: 'actor.url',
     },
-    verb: "deleted",
+    verb: 'deleted',
     result: {
-      branch: ["a branch", "branches"],
-      tag: ["a tag", "tags"],
-      repository: ["a repository", "repositories"],
+      branch: ['a branch', 'branches'],
+      tag: ['a tag', 'tags'],
+      repository: ['repository', 'repositories'],
     },
     subject: {
-      id: "payload.ref",
+      branch: {
+        id: 'payload.ref',
+      },
+      tag: {
+        id: 'payload.ref',
+      },
+      repository: {
+        id: 'repo.name',
+        url: 'repo.url',
+        title: 'repo.name',
+      },
     },
     parent: {
-      id: "repo.name",
-      url: "repo.url",
-      preposition: "in",
-      title: "repo.name",
+      branch: repoParentPaths,
+      tag: repoParentPaths,
     },
   },
-}
+};
 
-export default DeleteEvent
+export default DeleteEvent;
 
 export interface DeleteEventPayload {
-  ref: string
-  ref_type: string
-  pusher_type: string
+  ref: string;
+  ref_type: string;
+  pusher_type: string;
 }

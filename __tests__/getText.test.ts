@@ -382,7 +382,7 @@ describe('renderEvents for all event sets', () => {
       dateContent: false,
     });
 
-    expect(plainEvents.length).toBe(6);
+    expect(plainEvents.length).toBe(7);
 
     // plainEvents.forEach((recs, i) => {
     //   fs.writeFileSync(
@@ -406,7 +406,7 @@ describe('renderEvents for all event sets', () => {
 
     let mdEvents = renderEvents(testEvents, { md: true, dateContent: false });
 
-    expect(mdEvents.length).toBe(6);
+    expect(mdEvents.length).toBe(7);
 
     // mdEvents.forEach((recs, i) => {
     //   fs.writeFileSync(

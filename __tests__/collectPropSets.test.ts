@@ -107,7 +107,7 @@ describe('collectEventsByDate', () => {
         }
       }
     });
-    expect(eventsByDateRange.length).toBe(6);
+    expect(eventsByDateRange.length).toBe(7);
   });
 
   it('should split the test events into the expected groups with 3 day range', () => {
@@ -150,7 +150,7 @@ describe('collectEventsByDate', () => {
         }
       }
     });
-    expect(eventsByDateRange.length).toBe(8);
+    expect(eventsByDateRange.length).toBe(9);
   });
 });
 
@@ -176,7 +176,7 @@ describe('getSortedDatedEventCollections', () => {
       ).toStrictEqual(sdec.eventPropSetGroups);
     });
 
-    expect(sdecs.length).toBe(6);
+    expect(sdecs.length).toBe(7);
   });
 
   it('should return expected collections with 3-day date range', () => {
@@ -206,6 +206,6 @@ describe('getSortedDatedEventCollections', () => {
     //  __12-18 - 12-24__
     //  12-27 - 12-29
     //
-    expect(sdecs.length).toBe(8);
+    expect(sdecs.length).toBe(9);
   });
 });

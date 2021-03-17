@@ -2,34 +2,47 @@ import {
   defaultActorPaths,
   GithubEventType,
   repoParentPaths,
-} from "./helperTypes"
+} from './helperTypes';
 
 const CreateEvent: GithubEventType = {
   config: {
-    actionPropPath: "payload.ref_type",
-    actionTypes: ["branch", "tag", "repository"],
+    actionPropPath: 'payload.ref_type',
+    actionTypes: ['branch', 'tag', 'repository'],
   },
   paths: {
     actor: defaultActorPaths,
-    verb: "created",
+    verb: 'created',
     result: {
-      branch: ["a branch", "branches"],
-      tag: ["a tag", "tags"],
-      repository: ["a repository", "repositories"],
+      branch: ['branch', 'branches'],
+      tag: ['a tag', 'tags'],
+      repository: ['repository', 'repositories'],
     },
     subject: {
-      id: "payload.ref",
+      branch: {
+        id: 'payload.ref',
+      },
+      tag: {
+        id: 'payload.ref',
+      },
+      repository: {
+        id: 'repo.name',
+        url: 'repo.url',
+        title: 'repo.name',
+      },
     },
-    parent: repoParentPaths,
+    parent: {
+      branch: repoParentPaths,
+      tag: repoParentPaths,
+    },
   },
-}
+};
 
-export default CreateEvent
+export default CreateEvent;
 
 export interface CreateEventPayload {
-  ref: string
-  ref_type: string
-  master_branch: string
-  description: string
-  pusher_type: string
+  ref: string;
+  ref_type: string;
+  master_branch: string;
+  description: string;
+  pusher_type: string;
 }
