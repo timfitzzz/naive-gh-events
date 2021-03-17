@@ -2,14 +2,19 @@
   "name": "naive-gh-events",
   "version": "0.9.3",
   "description": "Render event objects from the GitHub API to readable English in plaintext or markdown.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "author": "Tim Fitzgerald <diceytroop@gmail.com>",
   "license": "MIT",
+  "main": "dist/cjs/index.js",
+  "types": "dist/esm/index.d.ts",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "test": "yarn jest --no-verbose",
     "coverage": "yarn jest --collectCoverage",
-    "prepublish": "tsc"
+    "compile": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "prepublishOnly": "yarn compile"
   },
   "dependencies": {
     "@octokit/types": "^6.12.2",
