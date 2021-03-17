@@ -37,12 +37,12 @@ kii-chan-reloaded edited 2 wiki pages in kii-chan-reloaded/GeneticChickengineeri
 
 naive-gh-events takes a highly general approach to interpreting the contents of GitHub event objects. Each event type can be boiled down into several linguistic abstractions, based on various properties of the event:
 
-**actor**: the user (person or bot) whose action generates the event 
-**verb**: expresses the action taken 
-**result**: in general terms, the result of the action 
-**subject**: the product(s) of the action 
-**target**: what the action is taken upon 
-**parent**: the context within which the action occurs 
+* **actor**: the user (person or bot) whose action generates the event  
+* **verb**: expresses the action taken  
+* **result**: in general terms, the result of the action  
+* **subject**: the product(s) of the action  
+* **target**: what the action is taken upon  
+* **parent**: the context within which the action occurs  
 
 By generating event-specific language outputs, each of these can be manipulated sensitively to provide natural language summaries for single events, as well as to group events in a way that makes sense. 
 
