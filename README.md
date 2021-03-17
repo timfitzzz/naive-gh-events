@@ -26,7 +26,7 @@ kii-chan-reloaded edited 2 wiki pages in kii-chan-reloaded/GeneticChickengineeri
   Settings (https://github.com/kii-chan-reloaded/GeneticChickengineering/wiki/Settings)
 ```
 
-####Table of Contents
+### Table of Contents
 1. [How it Works](#how-it-works) 
 2. [Supported Event Types](#supported-event-types) 
 3. [How to Install](#how-to-install) 
