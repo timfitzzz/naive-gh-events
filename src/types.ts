@@ -88,6 +88,7 @@ export interface NaiveConfig {
   indentContent?: boolean;
   dateTimeFormatOptions?: LocaleOptions;
   newLinesBetween?: boolean;
+  reverseSortEvents?: boolean;
 }
 
 export const defaultNaiveConfig: NaiveConfig = {
@@ -102,6 +103,7 @@ export const defaultNaiveConfig: NaiveConfig = {
   indentContent: true,
   dateTimeFormatOptions: DateTime.DATE_FULL,
   newLinesBetween: true,
+  reverseSortEvents: false,
 };
 
 export type RenderedSubjectAndContent = [subject: string, content?: string];

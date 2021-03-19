@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@octokit/types": "^6.12.2",
+    "leaked-handles": "^5.2.0",
     "lodash": "^4.17.21",
     "luxon": "^1.26.0"
   },

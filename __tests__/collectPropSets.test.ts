@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-
+require('leaked-handles');
 import testData from './testData';
 import EventTypes, { GHEvent } from '../src/eventTypes';
 import {
@@ -63,10 +63,6 @@ describe('collectEventsByDate', () => {
       (acc, tes) => acc.concat(tes.propSets),
       [] as TestEvent['propSets']
     );
-
-    // eventPropSets.forEach((eps, i) => {
-    //   console.dir(i, eps.date)
-    // })
 
     return eventPropSets;
   });
@@ -155,12 +151,19 @@ describe('collectEventsByDate', () => {
 });
 
 describe('getSortedDatedEventCollections', () => {
-  it('should return expected collections with default options', () => {
+  const defaultSdecsConfig = _.omit(defaultNaiveConfig, [
+    'md',
+    'omitContent',
+    'indentContent',
+    'dateTimeFormatOptions',
+  ]);
+
+  it('should return expected collections with default optionssss', () => {
     let sdecs = getSortedDatedEventCollections(
       testEventsSets.reduce((acc, tes) => {
         return acc.concat(tes.events);
       }, [] as GHEvent[]),
-      _.omit(defaultNaiveConfig, [
+      _.omit(defaultSdecsConfig, [
         'md',
         'omitContent',
         'indentContent',
@@ -169,20 +172,18 @@ describe('getSortedDatedEventCollections', () => {
     ) as SortedDatedEventCollections;
 
     sdecs.forEach((sdec) => {
-      expect(
-        [...sdec.eventPropSetGroups].sort(
-          (a, b) => a[0].date.getTime() - b[0].date.getTime()
-        )
-      ).toStrictEqual(sdec.eventPropSetGroups);
+      let expected = [...sdec.eventPropSetGroups].sort(
+        (a, b) => b[0].date.getTime() - a[0].date.getTime()
+      );
+      expect(expected).toStrictEqual(sdec.eventPropSetGroups);
     });
 
     expect(sdecs.length).toBe(7);
   });
 
   it('should return expected collections with 3-day date range', () => {
-    let config = Object.assign(defaultNaiveConfig, { groupByDays: 3 });
+    let config = Object.assign(defaultSdecsConfig, { groupByDays: 3 });
 
-    // console.dir(config)
     let sdecs = getSortedDatedEventCollections(
       testEventsSets.reduce((acc, tes) => {
         return acc.concat(tes.events);
@@ -207,5 +208,141 @@ describe('getSortedDatedEventCollections', () => {
     //  12-27 - 12-29
     //
     expect(sdecs.length).toBe(9);
+  });
+});
+
+describe('getSortedDatedEventCollections sortBy and reverseSort functionality', () => {
+  const defaultSdecsConfig = _.omit(defaultNaiveConfig, [
+    'md',
+    'omitContent',
+    'indentContent',
+    'dateTimeFormatOptions',
+  ]);
+
+  describe('sortBy: date, collapse: false', () => {
+    it('should sort events from now -> past', () => {
+      let sortTestEvents = [
+        testEventsSets[0].events[0],
+        testEventsSets[9].events[0],
+        testEventsSets[11].events[0],
+      ];
+
+      let sdecs = getSortedDatedEventCollections(sortTestEvents, {
+        ...defaultSdecsConfig,
+        collapse: false,
+        reverseSortEvents: false,
+      });
+
+      expect(sdecs[0].startDate.getTime()).toBeGreaterThanOrEqual(
+        sdecs[1].startDate.getTime()
+      );
+      expect(sdecs[1].startDate.getTime()).toBeGreaterThanOrEqual(
+        sdecs[2].startDate.getTime()
+      );
+
+      sdecs.forEach((sdec) => {
+        sdec.eventPropSetGroups.forEach((epsg) => {
+          epsg.forEach((eps, i) => {
+            if (i < epsg.length - 1) {
+              expect(eps.date.getTime()).toBeGreaterThanOrEqual(
+                epsg[i + 1].date.getTime()
+              );
+            }
+          });
+        });
+      });
+    });
+  });
+
+  describe('sortBy: date, collapse: false, reverseSort: true', () => {
+    let config = Object.assign(defaultSdecsConfig, {
+      collapse: false,
+      reverseSortEvents: true,
+    });
+
+    it('should sort events from past -> now', () => {
+      let sortTestEvents = [
+        testEventsSets[0].events[0],
+        testEventsSets[9].events[0],
+        testEventsSets[11].events[0],
+      ];
+
+      let sdecs = getSortedDatedEventCollections(sortTestEvents, {
+        ...defaultSdecsConfig,
+        collapse: false,
+        reverseSortEvents: true,
+      });
+
+      // expect(sdecs[2].startDate.getTime()).toBeGreaterThanOrEqual(
+      //   sdecs[1].startDate.getTime()
+      // );
+      // expect(sdecs[1].startDate.getTime()).toBeGreaterThanOrEqual(
+      //   sdecs[0].startDate.getTime()
+      // );
+
+      sdecs.forEach((sdec) => {
+        sdec.eventPropSetGroups.forEach((epsg) => {
+          epsg.forEach((eps, i) => {
+            if (i < epsg.length - 1) {
+              expect(epsg[i + 1].date.getTime()).toBeGreaterThanOrEqual(
+                eps.date.getTime()
+              );
+            }
+          });
+        });
+      });
+    });
+  });
+
+  describe('sortBy: type, collapse: false, reverseSortEvents: true', () => {
+    let config = Object.assign(defaultSdecsConfig, {
+      collapse: false,
+      reverseSortEvents: true,
+    });
+
+    it('should sort events from now -> past', () => {
+      let sortTestEvents = [
+        testEventsSets[0].events[0],
+        testEventsSets[9].events[0],
+        testEventsSets[11].events[0],
+      ];
+
+      let sdecs = getSortedDatedEventCollections(sortTestEvents, {
+        ...defaultSdecsConfig,
+        sortBy: 'type',
+        collapse: false,
+        reverseSortEvents: true,
+        groupByDays: 365,
+      });
+
+      // expect(sdecs[2].startDate.getTime()).toBeGreaterThanOrEqual(
+      //   sdecs[1].startDate.getTime()
+      // );
+      // expect(sdecs[1].startDate.getTime()).toBeGreaterThanOrEqual(
+      //   sdecs[0].startDate.getTime()
+      // );
+
+      // sdecs.forEach((sdec) => {
+      //   sdec.eventPropSetGroups.forEach((epsg, i) => {
+
+      //     if (i < sdec.eventPropSetGroups.length - 1) {
+      //       expect(epsg)
+      //     }
+      //     epsg.forEach((eps, i) => {
+      //       if (i < epsg.length - 1) {
+      //         expect(eps.type.localeCompare(epsg[i + 1].type)).toBe(-1)
+      //       }
+      //     });
+      //   });
+      // });
+
+      sdecs[0].eventPropSetGroups.forEach((epsg, i, epsgs) => {
+        console.dir(epsg[0]);
+        if (i < epsgs.length - 1) {
+          console.dir(epsg[0].type, epsgs[i + 1][0].type);
+          expect(epsg[0].type.localeCompare(epsgs[i + 1][0].type)).toBe(1);
+        }
+      });
+    });
   });
 });

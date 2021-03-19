@@ -222,12 +222,11 @@ export function collectEventsByDate(
 
 export function getSortedDatedEventCollections(
   events: GHEvent[],
-  { sortBy, collapse, groupByDays, startDate }: NaiveConfig
+  { sortBy, collapse, groupByDays, startDate, reverseSortEvents }: NaiveConfig
 ): SortedDatedEventCollections {
-  let propSets = getEventsPropSets(events).sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
   let output: SortedDatedEventCollections | DatedEventCollections = [];
+
+  let propSets = getEventsPropSets(events);
 
   if (groupByDays) {
     output = collectEventsByDate(
@@ -239,16 +238,35 @@ export function getSortedDatedEventCollections(
     output = collectEventsByDate(propSets, new Date('1/1/1970'), 1000000000);
   }
 
+  if (sortBy === 'date' && reverseSortEvents) {
+    output = output; // everything is already sorted this way after collectEventsByDate
+  } else {
+    // no matter what we're sorting with, if we're not sorting with reverse date, we should
+    // start with everything sorted from most recent to least.
+    output = output
+      .sort(
+        (decA, decB) =>
+          new Date(decB.startDate).getTime() -
+          new Date(decA.startDate).getTime()
+      )
+      .map((dec) => ({
+        ...dec,
+        eventPropSets: dec.eventPropSets.sort(
+          (epsA, epsB) => epsB.date.getTime() - epsA.date.getTime()
+        ),
+      }));
+  }
+
   if (collapse) {
     output = output.map((eventCollection) => ({
       ...eventCollection,
       eventPropSetGroups: groupEventPropSets(eventCollection.eventPropSets),
-    }));
+    })) as SortedDatedEventCollections;
   } else {
     output = output.map((eventCollection) => ({
       ...eventCollection,
       eventPropSetGroups: eventCollection.eventPropSets.map((epset) => [epset]),
-    }));
+    })) as SortedDatedEventCollections;
   }
 
   if (sortBy && sortBy !== 'date') {
