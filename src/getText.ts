@@ -301,11 +301,11 @@ function formatRenderedEventsTextSet(
 ): RenderedEventsTextSet {
   let [dates, summary, ...content] = rets;
 
-  // the last line ending (could be summary or content, depending)
-  let lastLineEnding = '  \r\n' + (newLinesBetween ? '\r\n' : '');
-
   // if omitContent, drop content
   content = omitContent ? [] : content;
+
+  // the last line ending (could be summary or content, depending)
+  let lastLineEnding = '  \r\n' + (newLinesBetween ? '\r\n' : '');
 
   // finally, handle indentation
   let contentIndentation = indentContent ? (md ? '* ' : '  ') : '';
@@ -328,7 +328,10 @@ function formatRenderedEventsTextSet(
       i != content.length - 1 ? contentLine + '  \r\n' : contentLine
     );
     // ...and apply last line ending to last content string
-    content[content.length - 1] = content[content.length - 1] + lastLineEnding;
+    content[content.length - 1] =
+      content[content.length - 1] +
+      lastLineEnding + // hacky workaround for edge case (gh issue #9)
+      (md && indentContent && !newLinesBetween ? '\r\n' : '');
   }
 
   return [dates, summary, ...content];
