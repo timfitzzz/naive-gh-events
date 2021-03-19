@@ -477,9 +477,9 @@ describe('renderEvents for multiple commit push events', () => {
       renderEvents([multiplePushEvent], { md: true })[0]
         .renderedEventCollections
     ).toStrictEqual([
-      `[theykay](https://github.com/theykay) pushed 2 commits to refs/heads/main in [theykay/bubblegum](https://github.com/theykay/bubblegum) \r\n` +
-        `* [1575f3330e3121267526d846492bf71f0ca00193](https://github.com/theykay/bubblegum/commits/1575f3330e3121267526d846492bf71f0ca00193): animated dropdown menu to work on focus for xs screens and hover for everything else \r\n` +
-        `* [786c305bd40e2642d39c5828e41c9d080b5d2e85](https://github.com/theykay/bubblegum/commits/786c305bd40e2642d39c5828e41c9d080b5d2e85): added react fortawesome \r\n\r\n`,
+      `[theykay](https://github.com/theykay) pushed 2 commits to refs/heads/main in [theykay/bubblegum](https://github.com/theykay/bubblegum)  \r\n` +
+        `* [1575f3330e3121267526d846492bf71f0ca00193](https://github.com/theykay/bubblegum/commits/1575f3330e3121267526d846492bf71f0ca00193): animated dropdown menu to work on focus for xs screens and hover for everything else  \r\n` +
+        `* [786c305bd40e2642d39c5828e41c9d080b5d2e85](https://github.com/theykay/bubblegum/commits/786c305bd40e2642d39c5828e41c9d080b5d2e85): added react fortawesome  \r\n\r\n`,
     ]);
   });
 });
@@ -494,9 +494,9 @@ describe('renderEvents for multiple pull request comment events', () => {
       renderEvents(multiplePullRequestCommentEvents, { md: true })[0]
         .renderedEventCollections
     ).toStrictEqual([
-      `[paq](https://github.com/paq) added 2 comments on pull request [avm2: Implement ByteArray](https://github.com/ruffle-rs/ruffle/pull/3213) in [ruffle-rs/ruffle](https://github.com/ruffle-rs/ruffle) \r\n` +
-        '* [575624667](https://github.com/ruffle-rs/ruffle/pull/3213#discussion_r575624667): It seems that `coerce_to_string` is necessary here as well.\r\n  \r\n  Test code\r\n  ```as\r\n  import flash.utils.ByteArray;\r\n  import flash.utils.Endian;\r\n  \r\n  class A {\r\n      public function A() {}\r\n      public function toString():String {\r\n          return "shift-jis";\r\n      }\r\n  }\r\n  \r\n  var test = new ByteArray();\r\n  test.writeMultiByte("次", new A());\r\n  test.position = 0;\r\n  trace(test.readMultiByte(2, "shift-jis"));\r\n  ```\r\n  \r\n  Flash player prints `次`.\r\n  Ruffle prints `谺`.\r\n   \r\n' +
-        '* [575624667](https://github.com/ruffle-rs/ruffle/pull/3213#discussion_r575624667): It seems that `coerce_to_string` is necessary here as well.\r\n  \r\n  Test code\r\n  ```as\r\n  import flash.utils.ByteArray;\r\n  import flash.utils.Endian;\r\n  \r\n  class A {\r\n      public function A() {}\r\n      public function toString():String {\r\n          return "shift-jis";\r\n      }\r\n  }\r\n  \r\n  var test = new ByteArray();\r\n  test.writeMultiByte("次", new A());\r\n  test.position = 0;\r\n  trace(test.readMultiByte(2, "shift-jis"));\r\n  ```\r\n  \r\n  Flash player prints `次`.\r\n  Ruffle prints `谺`.\r\n   \r\n\r\n',
+      `[paq](https://github.com/paq) added 2 comments on pull request [avm2: Implement ByteArray](https://github.com/ruffle-rs/ruffle/pull/3213) in [ruffle-rs/ruffle](https://github.com/ruffle-rs/ruffle)  \r\n` +
+        '* [575624667](https://github.com/ruffle-rs/ruffle/pull/3213#discussion_r575624667): It seems that `coerce_to_string` is necessary here as well.\r\n  \r\n  Test code\r\n  ```as\r\n  import flash.utils.ByteArray;\r\n  import flash.utils.Endian;\r\n  \r\n  class A {\r\n      public function A() {}\r\n      public function toString():String {\r\n          return "shift-jis";\r\n      }\r\n  }\r\n  \r\n  var test = new ByteArray();\r\n  test.writeMultiByte("次", new A());\r\n  test.position = 0;\r\n  trace(test.readMultiByte(2, "shift-jis"));\r\n  ```\r\n  \r\n  Flash player prints `次`.\r\n  Ruffle prints `谺`.\r\n    \r\n' +
+        '* [575624667](https://github.com/ruffle-rs/ruffle/pull/3213#discussion_r575624667): It seems that `coerce_to_string` is necessary here as well.\r\n  \r\n  Test code\r\n  ```as\r\n  import flash.utils.ByteArray;\r\n  import flash.utils.Endian;\r\n  \r\n  class A {\r\n      public function A() {}\r\n      public function toString():String {\r\n          return "shift-jis";\r\n      }\r\n  }\r\n  \r\n  var test = new ByteArray();\r\n  test.writeMultiByte("次", new A());\r\n  test.position = 0;\r\n  trace(test.readMultiByte(2, "shift-jis"));\r\n  ```\r\n  \r\n  Flash player prints `次`.\r\n  Ruffle prints `谺`.\r\n    \r\n\r\n',
     ]);
   });
 });

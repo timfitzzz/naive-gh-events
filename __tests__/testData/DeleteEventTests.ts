@@ -22,7 +22,7 @@ DeleteEventTests.testEvents.branch = [
           content: undefined,
           desc: undefined,
           preposition: undefined,
-          title: undefined,
+          title: 'feature/dirs-with-spaces',
         },
         actor: {
           id: 'rixtech',

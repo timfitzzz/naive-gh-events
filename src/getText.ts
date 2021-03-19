@@ -302,7 +302,7 @@ function formatRenderedEventsTextSet(
   let [dates, summary, ...content] = rets;
 
   // the last line ending (could be summary or content, depending)
-  let lastLineEnding = ' \r\n' + (newLinesBetween ? '\r\n' : '');
+  let lastLineEnding = '  \r\n' + (newLinesBetween ? '\r\n' : '');
 
   // if omitContent, drop content
   content = omitContent ? [] : content;
@@ -322,10 +322,10 @@ function formatRenderedEventsTextSet(
     summary = summary + lastLineEnding;
   } else {
     // otherwise, add basic line ending to summary line...
-    summary = summary + ' \r\n';
+    summary = summary + '  \r\n';
     // ...join content lines with basic line ending between them...
     content = content.map((contentLine, i) =>
-      i != content.length - 1 ? contentLine + ' \r\n' : contentLine
+      i != content.length - 1 ? contentLine + '  \r\n' : contentLine
     );
     // ...and apply last line ending to last content string
     content[content.length - 1] = content[content.length - 1] + lastLineEnding;

@@ -130,7 +130,7 @@ CreateEventTests.testEvents.branch = [
           content: undefined,
           desc: undefined,
           preposition: undefined,
-          title: undefined,
+          title: 'newPlatformDesign',
         },
         actor: {
           id: 'timfitzzz',
