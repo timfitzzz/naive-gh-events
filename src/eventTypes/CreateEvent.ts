@@ -20,9 +20,11 @@ const CreateEvent: GithubEventType = {
     subject: {
       branch: {
         id: 'payload.ref',
+        title: 'payload.ref',
       },
       tag: {
         id: 'payload.ref',
+        title: 'payload.ref',
       },
       repository: {
         id: 'repo.name',
