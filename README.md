@@ -1,10 +1,9 @@
 # naive-gh-events
-Render event objects from the GitHub API to natural English in plaintext or markdown. TypeScript definitions are included.
+Render event objects from the GitHub API to natural English, in plaintext or markdown. TypeScript definitions are included. [Check out a demo here](https://timfitzzz.github.io/naive-gh-events-demo).
 
 ### Example output:
 
 Markdown:
-
 
 > [timfitzzz](https://github.com/timfitzzz) started watching repository [mohebifar/react-use-context-selector](https://github.com/mohebifar/react-use-context-selector)  
 >  
@@ -35,7 +34,7 @@ kii-chan-reloaded edited 2 wiki pages in kii-chan-reloaded/GeneticChickengineeri
 
 ## How it Works
 
-naive-gh-events takes a highly general approach to interpreting the contents of GitHub event objects. Each event type can be boiled down into several linguistic abstractions, based on various properties of the event:
+naive-gh-events takes a generalized approach to interpreting the contents of GitHub event objects. Each event type can be boiled down into several linguistic abstractions, based on various properties of the event:
 
 * **actor**: the user (person or bot) whose action generates the event  
 * **verb**: expresses the action taken  
@@ -46,7 +45,7 @@ naive-gh-events takes a highly general approach to interpreting the contents of 
 
 By generating event-specific language outputs, each of these can be manipulated sensitively to provide natural language summaries for single events, as well as to group events in a way that makes sense. 
 
-In addition, naive-gh-events' markdown output (default) contains urls, making it quite easy to use this library to create a custom GitHub event tracking solution using only Markdown rendering. 
+In addition, naive-gh-events' markdown output (default) contains URIs, making it quite easy to use this library to create a custom GitHub event tracking solution using only Markdown rendering. 
 
 In sum, this implementation provides natural language and event collation functionality already used to generate social feeds on GitHub.com, but which are not provided by existing official or semi-official GitHub API libraries. 
 
@@ -54,54 +53,24 @@ In sum, this implementation provides natural language and event collation functi
 
 Supported event types and subtypes (see [note on untested or missing types](#missingTypes)):
 
-| type                          | subtypes *(not explicitly tested)* |
-| ----------------------------- | ---------------------------------- |
-| CommitCommentEvent            | n/a                                |
-| CreateEvent                   | repository                         |
-|                               | branch                             |
-|                               | *tag*                              |
-| DeleteEvent                   | *repository*                       |
-|                               | branch                             |
-|                               | *tag*                              |
-| ForkEvent                     |                                    |
-| GollumEvent                   | created                            |
-|                               | edited                             |
-| IssueCommentEvent             | created                            |
-|                               | *edited*                           |
-|                               | *deleted*                          |
-| IssuesEvent                   | *opened*                           |
-|                               | closed                             |
-|                               | *reopened*                         |
-|                               | *assigned*                         |
-|                               | *unassigned*                       |
-|                               | *labeled*                          |
-|                               | *unlabeled*                        |
-| MemberEvent                   | added                              |
-|                               | *edited*                           |
-|                               | *removed*                          |
-| PublicEvent                   |                                    |
-| PullRequestEvent              | *opened*                           |
-|                               | closed                             |
-|                               | *reopened*                         |
-|                               | *assigned*                         |
-|                               | *unassigned*                       |
-|                               | *review_requested*                 |
-|                               | *review_request_removed*           |
-|                               | *labeled*                          |
-|                               | *unlabeled*                        |
-|                               | *synchronize*                      |
-| PullRequestReviewCommentEvent | created                            |
-|                               | *edited*                           |
-|                               | *deleted*                          |
-| PullRequestReviewEvent        | created                            |
-|                               | *edited*                           |
-|                               | *deleted*                          |
-| PushEvent                     |                                    |
-| ReleaseEvent                  | published                          |
-|                               | *edited*                           |
-| *SponsorshipEvent*            | *added*                            |
-|                               | *removed*                          |
-| WatchEvent                    |                                    |
+| type                          | subtypes *(not explicitly tested)*                                                                                                          |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| CommitCommentEvent            | n/a                                                                                                                                         |
+| CreateEvent                   | repository, branch,*tag*                                                                                                                    |
+| DeleteEvent                   | *repository*, branch, *tag*                                                                                                                 |
+| ForkEvent                     | n/a                                                                                                                                         |
+| GollumEvent                   | created, edited                                                                                                                             |
+| IssueCommentEvent             | created, *edited*, *deleted*                                                                                                                |
+| IssuesEvent                   | *opened*, closed, *reopened*, *assigned*, *unassigned*, *labeled*, *unlabeled*                                                              |
+| MemberEvent                   | added, *edited*, *removed*                                                                                                                  |
+| PublicEvent                   | n/a                                                                                                                                         |
+| PullRequestEvent              | *opened*, closed, *reopened*, *assigned*, *unassigned*, *review_requested*, *review_request_removed*, *labeled*, *unlabeled*, *synchronize* |
+| PullRequestReviewCommentEvent | created, *edited*, *deleted*                                                                                                                |
+| PullRequestReviewEvent        | created, *edited*, *deleted*                                                                                                                |
+| PushEvent                     | n/a                                                                                                                                         |
+| ReleaseEvent                  | published, *edited*                                                                                                                         |
+| *SponsorshipEvent*            | *added*, *removed*                                                                                                                          |
+| WatchEvent                    | n/a                                                                                                                                         |
 
  
 --------------
@@ -171,24 +140,24 @@ These string sets are designed to be joined without further manipulation, render
 
 ### <a name="naive-config">NaiveConfig: { [key: string]: value }</a>
 
-You can provide the following options to renderEvents to control the resulting output.
+You can provide the following options to renderEvents to control the resulting output. You can demo the result of changing these settings on [the naive-gh-events demo here](https://timfitzzz.github.io/naive-gh-events-demo).
 
+| key                   | type          | range                                                                                                                     | default            | comment                                                                                                                                                                                                |
+| --------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| collapse              | boolean       | true or false                                                                                                             | true               | if true, the output will combine events within the same date range that differ only in subject                                                                                                         |
+| sortBy                | string        | 'date', 'actor', 'type', 'target', 'parent'                                                                               | 'date'             | which mapped field's value should events be sorted by?                                                                                                                                                 |
+| reverseSortOrder      | boolean       | true or false                                                                                                             | false              | reverse effect of sortBy field                                                                                                                                                                         |
+| dateSummaries         | boolean       | true or false                                                                                                             | false              | include event dates at beginning of summaries                                                                                                                                                          |
+| dateContent           | boolean       | true or false                                                                                                             | false              | include event dates in content when there are multiple reflected events                                                                                                                                |
+| groupByDays           | number        | any                                                                                                                       | 7                  | number of days to group events by. with "collapse: true", determines which events will be collated. with "collapse: false", events will be individually listed, but still collected by this date span. |
+| groupStartDay         | number        | 0-6                                                                                                                       | 0                  | number of weekday to start event groups from                                                                                                                                                           |
+| startDate             | Date          | any                                                                                                                       | 1/1/1970           | the date to begin processing events from. this is aimed at helping to automatically discard already-processed events.                                                                                  |
+| md                    | boolean       | true or false                                                                                                             | true               | render output in Markdown (if false, use plaintext)                                                                                                                                                    |
+| omitContent           | boolean       | true or false                                                                                                             | false              | render only summary lines                                                                                                                                                                              |
+| indentContent         | boolean       | true or false                                                                                                             | true               | indent content lines as unordered list items (Markdown) or using two spaces (plaintext)                                                                                                                |
+| dateTimeFormatOptions | LocaleOptions | [see Luxon documentation](https://moment.github.io/luxon/docs/manual/formatting.html#tolocalestring--strings-for-humans-) | DateTime.DATE_FULL | date/time formatting options as produced by Luxon. the default is Luxon's DateTime.DATE_FULL preset.                                                                                                   |
+| newLinesBetween       | boolean       | true or false                                                                                                             | true               | double-space between event blocks (individual events or collapsed sets, if 'collapse' is true.)                                                                                                        |
 
-
-| key                   | type          | range                                       | default            | comment                                                                                                                                                                                                |
-| --------------------- | ------------- | ------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| sortBy                | string        | 'date', 'actor', 'type', 'target', 'parent' | 'date'             | which mapped field's value should events be sorted by?                                                                                                                                                 |
-| collapse              | boolean       | true or false                               | true               | if true, the output will combine events within the same date range that differ only in subject                                                                                                         |
-| dateSummaries         | boolean       | true or false                               | false              | include event dates at beginning of summaries                                                                                                                                                          |
-| dateContent           | boolean       | true or false                               | false              | include event dates in content when there are multiple reflected events                                                                                                                                |
-| groupByDays           | number        | any                                         | 7                  | number of days to group events by. with "collapse: true", determines which events will be collated. with "collapse: false", events will be individually listed, but still collected by this date span. |
-| startDate             | Date          | any                                         | 1/1/1970           | the date to begin processing events from. this is aimed at helping to automatically discard already-processed events.                                                                                  |
-| md                    | boolean       | true or false                               | true               | render output in Markdown (if false, use plaintext)                                                                                                                                                    |
-| omitContent           | boolean       | true or false                               | false              | render only summary lines                                                                                                                                                                              |
-| indentContent         | boolean       | true or false                               | true               | indent content lines as unordered list items (Markdown) or using two spaces (plaintext)                                                                                                                |
-| dateTimeFormatOptions | LocaleOptions | see Luxon documentation                     | DateTime.DATE_FULL | date/time formatting options as produced by Luxon. the default is Luxon's DateTime.DATE_FULL preset.                                                                                                   |
-| newLinesBetween       | boolean       | true or false                               | true               | double-space between event blocks (individual events or collapsed sets, if 'collapse' is true.)                                                                                                        |
-|                       |
 
 
 
