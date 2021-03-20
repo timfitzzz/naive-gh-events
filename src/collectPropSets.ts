@@ -220,6 +220,123 @@ export function collectEventsByDate(
   return output;
 }
 
+export function sortEventPropSetGroups(
+  epsgs: EventPropSet[][],
+  sortBy: string,
+  reverseSortEvents: boolean
+): EventPropSet[][] {
+  let sortPaths: [string, string?] | undefined = undefined;
+  let output: EventPropSet[][] = [];
+
+  switch (sortBy) {
+    case 'type':
+      sortPaths = ['type'];
+      break;
+    case 'actor':
+      sortPaths = ['actor.id', 'actor.title'];
+      break;
+    case 'parent':
+      sortPaths = ['parent.title', 'parent.id'];
+      break;
+    case 'target':
+      sortPaths = ['target.title', 'target.id'];
+      break;
+    default:
+      break;
+  }
+
+  if (sortPaths) {
+    return [...epsgs].sort((epsgA, epsgB) => {
+      // console.log(sortPath);
+      let a: string | number | undefined = undefined;
+      let b: string | number | undefined = undefined;
+
+      if (sortPaths) {
+        let sp0ResultA = sortPaths[0]
+          ? _.get(epsgA[0], sortPaths![0])
+          : undefined;
+        let sp1ResultA = sortPaths[1]
+          ? _.get(epsgA[0], sortPaths![1])
+          : undefined;
+
+        a = sp0ResultA || sp1ResultA;
+
+        let sp0ResultB = sortPaths[0]
+          ? _.get(epsgB[0], sortPaths![0])
+          : undefined;
+        let sp1ResultB = sortPaths[1]
+          ? _.get(epsgB[0], sortPaths![1])
+          : undefined;
+
+        b = sp0ResultB || sp1ResultB;
+      }
+      //   _.get(epsgA[0], sortPaths![0]) || sortPaths![1]
+      //     ? _.get(epsgA[0], sortPaths![1])
+      //     : undefined;
+      // let b =
+      //   _.get(epsgB[0], sortPaths![0]) || sortPaths![1]
+      //     ? _.get(epsgB[0], sortPaths![1])
+      //     : undefined;
+
+      if ((a && !b) || (b && !a)) {
+        // console.log(`
+        //   sortBy: ${sortBy}
+        //   reverseSortEvents: ${reverseSortEvents}
+        //   sortPaths: ${sortPaths}
+        //   epsgA: ${JSON.stringify(epsgA)}
+        //   epsgA shortpath1 result: ${_.get(epsgA[0], sortPaths![0])}
+        //   epsgA shortpath2 result: ${_.get(epsgA[0], sortPaths![1])}
+        //   a: ${a}
+        //   epsgB: ${JSON.stringify(epsgB)}
+        //   epsgB shortpath1 result: ${_.get(epsgB[0], sortPaths![0])}
+        //   epsgB shortpath2 result: ${_.get(epsgB[0], sortPaths![1])}
+        //   b: ${b}
+        //   result: 1 is undefined, so it's 1
+        // `);
+        return 1;
+      } else if (!b && !a) {
+        //   console.log(`
+        //   sortBy: ${sortBy}
+        //   reverseSortEvents: ${reverseSortEvents}
+        //   sortPaths: ${sortPaths}
+        //   epsgA: ${JSON.stringify(epsgA)}
+        //   epsgA shortpath1 result: ${_.get(epsgA[0], sortPaths![0])}
+        //   epsgA shortpath2 result: ${_.get(epsgA[0], sortPaths![1])}
+        //   a: ${a}
+        //   epsgB: ${JSON.stringify(epsgB)}
+        //   epsgB shortpath1 result: ${_.get(epsgB[0], sortPaths![0])}
+        //   epsgB shortpath2 result: ${_.get(epsgB[0], sortPaths![1])}
+        //   b: ${b}
+        //   result: both undefined, so it's 0
+        // `);
+        return 0;
+      } else {
+        // sortBy === 'target' && console.log(a, b);
+        let result = !reverseSortEvents
+          ? a!.toString().localeCompare(b!.toString())
+          : b!.toString().localeCompare(a!.toString());
+        // console.log(`
+        //   sortBy: ${sortBy}
+        //   reverseSortEvents: ${reverseSortEvents}
+        //   sortPaths: ${sortPaths}
+        //   epsgA: ${JSON.stringify(epsgA)}
+        //   epsgA shortpath1 result: ${_.get(epsgA[0], sortPaths![0])}
+        //   epsgA shortpath2 result: ${_.get(epsgA[0], sortPaths![1])}
+        //   a: ${a}
+        //   epsgB: ${JSON.stringify(epsgB)}
+        //   epsgB shortpath1 result: ${_.get(epsgB[0], sortPaths![0])}
+        //   epsgB shortpath2 result: ${_.get(epsgB[0], sortPaths![1])}
+        //   b: ${b}
+        //   result: ${result}
+        // `);
+        return result;
+      }
+    });
+  } else {
+    return output;
+  }
+}
+
 export function getSortedDatedEventCollections(
   events: GHEvent[],
   { sortBy, collapse, groupByDays, startDate, reverseSortEvents }: NaiveConfig
@@ -251,7 +368,7 @@ export function getSortedDatedEventCollections(
       )
       .map((dec) => ({
         ...dec,
-        eventPropSets: dec.eventPropSets.sort(
+        eventPropSets: [...dec.eventPropSets].sort(
           (epsA, epsB) => epsB.date.getTime() - epsA.date.getTime()
         ),
       }));
@@ -269,15 +386,37 @@ export function getSortedDatedEventCollections(
     })) as SortedDatedEventCollections;
   }
 
+  // sort by non-date fields
   if (sortBy && sortBy !== 'date') {
-    // should already be sorted by date
-    output = output.map((refinedEventCollection) => ({
-      ...refinedEventCollection,
-      eventPropSetGroups: refinedEventCollection.eventPropSetGroups.sort(
-        (epsgroupA, epsgroupB) => epsgroupA[0][sortBy] - epsgroupB[0][sortBy]
-      ),
-    }));
+    // console.dir('sorting by non-date field ' + sortBy);
+
+    output = output.map((sdec) => {
+      // console.log(sdec.eventPropSetGroups);
+      let sortedSdec = {
+        // SortedDatedEventCollection
+        ...sdec,
+        eventPropSetGroups: sortEventPropSetGroups(
+          sdec.eventPropSetGroups,
+          sortBy,
+          reverseSortEvents!
+        ),
+      };
+
+      return sortedSdec;
+    });
   }
+
+  // console.log(output);
+
+  // if (sortBy && sortBy !== 'date') {
+  //   // should already be sorted by date
+  //   output = output.map((refinedEventCollection) => ({
+  //     ...refinedEventCollection,
+  //     eventPropSetGroups: refinedEventCollection.eventPropSetGroups.sort(
+  //       (epsgroupA, epsgroupB) => epsgroupA[0][sortBy] - epsgroupB[0][sortBy]
+  //     ),
+  //   }));
+  // }
 
   return output as SortedDatedEventCollections;
 }

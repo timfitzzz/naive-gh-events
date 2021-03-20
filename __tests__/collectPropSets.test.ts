@@ -5,6 +5,7 @@ import EventTypes, { GHEvent } from '../src/eventTypes';
 import {
   defaultNaiveConfig,
   TestEvent,
+  EventPropSet,
   SortedDatedEventCollections,
 } from '../src/types';
 import { getEventsPropSets } from '../src/getProps';
@@ -12,12 +13,13 @@ import {
   collectEventsByDate,
   getSortedDatedEventCollections,
   groupEventPropSets,
+  sortEventPropSetGroups,
 } from '../src/collectPropSets';
 import _ from 'lodash';
 
 let testEventsSets: TestEvent[] = [];
 
-beforeAll(() => {
+beforeEach(() => {
   Object.getOwnPropertyNames(testData).forEach((testName: string) => {
     let actionTypes = EventTypes[testName].config.actionTypes;
 
@@ -211,6 +213,229 @@ describe('getSortedDatedEventCollections', () => {
   });
 });
 
+describe('sortEventPropSetGroups', () => {
+  it('should correctly sort by type in the reverse direction', () => {
+    let eventPropSetGroups: EventPropSet[][] = [
+      [testEventsSets[0].propSets[0]],
+      [testEventsSets[9].propSets[0]],
+      [testEventsSets[11].propSets[0]],
+    ];
+
+    let sortedEventPropSetGroups = sortEventPropSetGroups(
+      [...eventPropSetGroups],
+      'type',
+      true
+    );
+
+    // console.log(sortedEventPropSetGroups);
+
+    sortedEventPropSetGroups.map((epsg, i, epsgs) => {
+      if (i < epsgs.length - 1)
+        expect(
+          epsgs[i][0].type.localeCompare(epsgs[i + 1][0].type)
+        ).toBeGreaterThanOrEqual(0);
+    });
+  });
+});
+
+describe('sortEventPropSetGroups', () => {
+  it('should correctly sort by actor in the normal direction', () => {
+    let eventPropSetGroups: EventPropSet[][] = [
+      [testEventsSets[0].propSets[0]],
+      [testEventsSets[9].propSets[0]],
+      [testEventsSets[11].propSets[0]],
+    ];
+
+    let sortedEventPropSetGroups = sortEventPropSetGroups(
+      [...eventPropSetGroups],
+      'actor',
+      false
+    );
+
+    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].actor.id));
+
+    sortedEventPropSetGroups.map((epsg, i, epsgs) => {
+      if (i < epsgs.length - 1)
+        expect(
+          epsgs[i][0].actor.id.localeCompare(epsgs[i + 1][0].actor.id)
+        ).toBeLessThanOrEqual(0);
+    });
+  });
+});
+
+describe('sortEventPropSetGroups', () => {
+  it('should correctly sort by actor in the reverse direction', () => {
+    let eventPropSetGroups: EventPropSet[][] = [
+      [testEventsSets[0].propSets[0]],
+      [testEventsSets[9].propSets[0]],
+      [testEventsSets[11].propSets[0]],
+    ];
+
+    let sortedEventPropSetGroups = sortEventPropSetGroups(
+      [...eventPropSetGroups],
+      'actor',
+      true
+    );
+
+    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].actor.id));
+
+    sortedEventPropSetGroups.map((epsg, i, epsgs) => {
+      if (i < epsgs.length - 1)
+        expect(
+          epsgs[i][0].actor.id.localeCompare(epsgs[i + 1][0].actor.id)
+        ).toBeGreaterThanOrEqual(0);
+    });
+  });
+});
+
+describe('sortEventPropSetGroups', () => {
+  it('should correctly sort by target in the normal direction', () => {
+    let eventPropSetGroups: EventPropSet[][] = [
+      [testEventsSets[0].propSets[0]],
+      [testEventsSets[9].propSets[0]],
+      [testEventsSets[11].propSets[0]],
+      [testEventsSets[13].propSets[0]],
+      [testEventsSets[4].propSets[0]],
+      [testEventsSets[1].propSets[0]],
+    ];
+
+    // console.dir(eventPropSetGroups.map((sepsg) => sepsg[0].target));
+
+    let sortedEventPropSetGroups = sortEventPropSetGroups(
+      [...eventPropSetGroups],
+      'target',
+      false
+    );
+
+    // console.dir(
+    //   sortedEventPropSetGroups.map((sepsg) => JSON.stringify(sepsg[0].target))
+    // );
+
+    sortedEventPropSetGroups.map((epsg, i, epsgs) => {
+      if (
+        i < epsgs.length - 1 &&
+        epsgs[i][0].target &&
+        epsgs[i + 1][0].target &&
+        epsgs[i][0].target.title &&
+        epsgs[i + 1][0].target.title
+      )
+        expect(
+          epsgs[i][0].target.title
+            .toString()
+            .localeCompare(epsgs[i + 1][0].target.title.toString())
+        ).toBeLessThanOrEqual(0);
+    });
+  });
+});
+
+describe('sortEventPropSetGroups', () => {
+  it('should correctly sort by target in the reverse direction', () => {
+    let eventPropSetGroups: EventPropSet[][] = [
+      [testEventsSets[0].propSets[0]],
+      [testEventsSets[9].propSets[0]],
+      [testEventsSets[11].propSets[0]],
+      [testEventsSets[13].propSets[0]],
+      [testEventsSets[4].propSets[0]],
+      [testEventsSets[1].propSets[0]],
+    ];
+
+    let sortedEventPropSetGroups = sortEventPropSetGroups(
+      [...eventPropSetGroups],
+      'target',
+      true
+    );
+
+    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].target));
+
+    sortedEventPropSetGroups.map((epsg, i, epsgs) => {
+      if (
+        i < epsgs.length - 1 &&
+        epsgs[i][0].target &&
+        epsgs[i + 1][0].target &&
+        epsgs[i][0].target.title &&
+        epsgs[i + 1][0].target.title
+      )
+        expect(
+          epsgs[i][0].target.title
+            .toString()
+            .localeCompare(epsgs[i + 1][0].target.title.toString())
+        ).toBeGreaterThanOrEqual(0);
+    });
+  });
+});
+
+describe('sortEventPropSetGroups', () => {
+  it('should correctly sort by parent in the normal direction', () => {
+    let eventPropSetGroups: EventPropSet[][] = [
+      [testEventsSets[0].propSets[0]],
+      [testEventsSets[9].propSets[0]],
+      [testEventsSets[11].propSets[0]],
+      [testEventsSets[13].propSets[0]],
+      [testEventsSets[4].propSets[0]],
+      [testEventsSets[1].propSets[0]],
+    ];
+
+    let sortedEventPropSetGroups = sortEventPropSetGroups(
+      [...eventPropSetGroups],
+      'parent',
+      false
+    );
+
+    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].parent));
+
+    sortedEventPropSetGroups.map((epsg, i, epsgs) => {
+      if (
+        i < epsgs.length - 1 &&
+        epsgs[i][0].parent &&
+        epsgs[i + 1][0].parent &&
+        epsgs[i][0].parent.title &&
+        epsgs[i + 1][0].parent.title
+      )
+        expect(
+          epsgs[i][0].parent.title
+            .toString()
+            .localeCompare(epsgs[i + 1][0].parent.title.toString())
+        ).toBeLessThanOrEqual(0);
+    });
+  });
+});
+
+describe('sortEventPropSetGroups', () => {
+  it('should correctly sort by parent in the reverse direction', () => {
+    let eventPropSetGroups: EventPropSet[][] = [
+      [testEventsSets[0].propSets[0]],
+      [testEventsSets[9].propSets[0]],
+      [testEventsSets[11].propSets[0]],
+      [testEventsSets[13].propSets[0]],
+      [testEventsSets[4].propSets[0]],
+      [testEventsSets[1].propSets[0]],
+    ];
+
+    let sortedEventPropSetGroups = sortEventPropSetGroups(
+      [...eventPropSetGroups],
+      'parent',
+      true
+    );
+
+    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].parent));
+
+    sortedEventPropSetGroups.map((epsg, i, epsgs) => {
+      if (
+        i < epsgs.length - 1 &&
+        epsgs[i][0].parent &&
+        epsgs[i + 1][0].parent &&
+        epsgs[i][0].parent.title &&
+        epsgs[i + 1][0].parent.title
+      )
+        expect(
+          epsgs[i][0].parent.title
+            .toString()
+            .localeCompare(epsgs[i + 1][0].parent.title.toString())
+        ).toBeGreaterThanOrEqual(0);
+    });
+  });
+});
+
 describe('getSortedDatedEventCollections sortBy and reverseSort functionality', () => {
   const defaultSdecsConfig = _.omit(defaultNaiveConfig, [
     'md',
@@ -222,9 +447,9 @@ describe('getSortedDatedEventCollections sortBy and reverseSort functionality', 
   describe('sortBy: date, collapse: false', () => {
     it('should sort events from now -> past', () => {
       let sortTestEvents = [
-        testEventsSets[0].events[0],
-        testEventsSets[9].events[0],
-        testEventsSets[11].events[0],
+        ...testEventsSets[0].events,
+        ...testEventsSets[9].events,
+        ...testEventsSets[11].events,
       ];
 
       let sdecs = getSortedDatedEventCollections(sortTestEvents, {
@@ -315,6 +540,8 @@ describe('getSortedDatedEventCollections sortBy and reverseSort functionality', 
         groupByDays: 365,
       });
 
+      // console.dir(JSON.stringify(sdecs));
+
       // expect(sdecs[2].startDate.getTime()).toBeGreaterThanOrEqual(
       //   sdecs[1].startDate.getTime()
       // );
@@ -337,10 +564,12 @@ describe('getSortedDatedEventCollections sortBy and reverseSort functionality', 
       // });
 
       sdecs[0].eventPropSetGroups.forEach((epsg, i, epsgs) => {
-        console.dir(epsg[0]);
+        // console.dir(epsg[0]);
         if (i < epsgs.length - 1) {
-          console.dir(epsg[0].type, epsgs[i + 1][0].type);
-          expect(epsg[0].type.localeCompare(epsgs[i + 1][0].type)).toBe(1);
+          // console.dir(epsg[0].type, epsgs[i + 1][0].type);
+          expect(
+            epsg[0].type.localeCompare(epsgs[i + 1][0].type)
+          ).toBeGreaterThanOrEqual(0);
         }
       });
     });
