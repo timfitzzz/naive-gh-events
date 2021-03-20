@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-require('leaked-handles');
 import testData from './testData';
 import EventTypes, { GHEvent } from '../src/eventTypes';
 import {
