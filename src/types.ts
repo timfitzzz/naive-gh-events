@@ -82,6 +82,7 @@ export interface NaiveConfig {
   dateSummaries?: boolean;
   dateContent?: boolean;
   groupByDays?: number;
+  groupStartDay?: number;
   startDate?: Date;
   md?: boolean;
   omitContent?: boolean;
@@ -95,6 +96,7 @@ export const defaultNaiveConfig: NaiveConfig = {
   sortBy: 'date',
   collapse: true,
   groupByDays: 7,
+  groupStartDay: 0,
   dateSummaries: false,
   dateContent: false,
   startDate: new Date('1/1/1970'),

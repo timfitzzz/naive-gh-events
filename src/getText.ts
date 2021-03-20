@@ -359,6 +359,7 @@ export function renderEvents(
   {
     sortBy = defaultNaiveConfig.sortBy,
     groupByDays = defaultNaiveConfig.groupByDays,
+    groupStartDay = defaultNaiveConfig.groupStartDay,
     dateSummaries = defaultNaiveConfig.dateSummaries,
     dateContent = defaultNaiveConfig.dateContent,
     collapse = defaultNaiveConfig.collapse,
@@ -366,11 +367,13 @@ export function renderEvents(
     startDate = defaultNaiveConfig.startDate,
     omitContent = defaultNaiveConfig.omitContent,
     indentContent = defaultNaiveConfig.indentContent,
-    dateTimeFormatOptions = DateTime.DATE_FULL,
-    newLinesBetween = true,
+    dateTimeFormatOptions = defaultNaiveConfig.dateTimeFormatOptions,
+    newLinesBetween = defaultNaiveConfig.newLinesBetween,
+    reverseSortEvents = defaultNaiveConfig.reverseSortEvents,
   }: Partial<NaiveConfig> = {
     sortBy: 'date',
     groupByDays: 7,
+    groupStartDay: 0,
     dateSummaries: false,
     dateContent: true,
     collapse: true,
@@ -380,11 +383,19 @@ export function renderEvents(
     indentContent: true,
     dateTimeFormatOptions: DateTime.DATE_FULL,
     newLinesBetween: true,
+    reverseSortEvents: false,
   }
 ): RenderedEventCollectionSet[] {
   let eventPropSetGroupCollection: SortedDatedEventCollections = getSortedDatedEventCollections(
     events,
-    { sortBy, collapse, groupByDays, startDate }
+    {
+      sortBy,
+      collapse,
+      groupByDays,
+      groupStartDay,
+      startDate,
+      reverseSortEvents,
+    }
   ) as SortedDatedEventCollections;
 
   return eventPropSetGroupCollection.map((sdec) => {

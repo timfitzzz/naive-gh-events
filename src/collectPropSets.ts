@@ -339,7 +339,14 @@ export function sortEventPropSetGroups(
 
 export function getSortedDatedEventCollections(
   events: GHEvent[],
-  { sortBy, collapse, groupByDays, startDate, reverseSortEvents }: NaiveConfig
+  {
+    sortBy,
+    collapse,
+    groupByDays,
+    groupStartDay,
+    startDate,
+    reverseSortEvents,
+  }: NaiveConfig
 ): SortedDatedEventCollections {
   let output: SortedDatedEventCollections | DatedEventCollections = [];
 
@@ -349,10 +356,16 @@ export function getSortedDatedEventCollections(
     output = collectEventsByDate(
       propSets,
       startDate || new Date('1/1/1970'),
-      groupByDays
+      groupByDays,
+      groupStartDay
     );
   } else {
-    output = collectEventsByDate(propSets, new Date('1/1/1970'), 1000000000);
+    output = collectEventsByDate(
+      propSets,
+      new Date('1/1/1970'),
+      1000000000,
+      groupStartDay
+    );
   }
 
   if (sortBy === 'date' && reverseSortEvents) {
