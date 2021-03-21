@@ -12,6 +12,7 @@ import {
   RenderedEventsTextSet,
 } from './types';
 import { getSortedDatedEventCollections } from './collectPropSets';
+import { validateEvents, InvalidResponse } from './validation';
 
 export function renderActorText(
   ActorProps: EventPropSet['actor'],
@@ -386,59 +387,80 @@ export function renderEvents(
     reverseSortEvents: false,
   }
 ): RenderedEventCollectionSet[] {
-  let eventPropSetGroupCollection: SortedDatedEventCollections = getSortedDatedEventCollections(
-    events,
-    {
-      sortBy,
-      collapse,
-      groupByDays,
-      groupStartDay,
-      startDate,
-      reverseSortEvents,
-    }
-  ) as SortedDatedEventCollections;
+  const { validEvents, invalidEvents, errReason, result } = validateEvents(
+    events
+  );
 
-  return eventPropSetGroupCollection.map((sdec) => {
-    let { startDate, endDate, eventPropSetGroups } = sdec;
+  if (result === 'invalid') {
+    console.warn('Invalid event input: ' + errReason);
+    return [];
+  }
 
-    return {
-      startDate: startDate ? renderDate(startDate, dateTimeFormatOptions) : '',
-      // startDate:
-      //   typeof startDate === "string"
-      //     ? startDate
-      //     : startDate
-      //     ? renderDate(startDate, dateTimeFormatOptions)
-      //     : "",
-      endDate:
-        typeof endDate === 'string'
-          ? endDate
-          : endDate
-          ? renderDate(endDate, dateTimeFormatOptions)
+  if (result === 'partial' && invalidEvents) {
+    invalidEvents.forEach((ir: InvalidResponse) => {
+      console.warn(ir[1] + JSON.stringify(ir[0]));
+    });
+  }
+
+  if (validEvents) {
+    let eventPropSetGroupCollection: SortedDatedEventCollections = getSortedDatedEventCollections(
+      validEvents,
+      {
+        sortBy,
+        collapse,
+        groupByDays,
+        groupStartDay,
+        startDate,
+        reverseSortEvents,
+      }
+    ) as SortedDatedEventCollections;
+
+    return eventPropSetGroupCollection.map((sdec) => {
+      let { startDate, endDate, eventPropSetGroups } = sdec;
+
+      return {
+        startDate: startDate
+          ? renderDate(startDate, dateTimeFormatOptions)
           : '',
-      renderedEventCollections: eventPropSetGroups
-        ? eventPropSetGroups.map((epsg) => {
-            let repts = renderEventPropSetGroup(epsg, {
-              md,
-              dateTimeFormatOptions,
-              dateSummaries,
-              dateContent,
-              omitContent,
-              indentContent,
-            });
+        // startDate:
+        //   typeof startDate === "string"
+        //     ? startDate
+        //     : startDate
+        //     ? renderDate(startDate, dateTimeFormatOptions)
+        //     : "",
+        endDate:
+          typeof endDate === 'string'
+            ? endDate
+            : endDate
+            ? renderDate(endDate, dateTimeFormatOptions)
+            : '',
+        renderedEventCollections: eventPropSetGroups
+          ? eventPropSetGroups.map((epsg) => {
+              let repts = renderEventPropSetGroup(epsg, {
+                md,
+                dateTimeFormatOptions,
+                dateSummaries,
+                dateContent,
+                omitContent,
+                indentContent,
+              });
 
-            let processedRenderedSet = formatRenderedEventsTextSet(repts, {
-              md,
-              indentContent,
-              omitContent,
-              newLinesBetween,
-            });
+              let processedRenderedSet = formatRenderedEventsTextSet(repts, {
+                md,
+                indentContent,
+                omitContent,
+                newLinesBetween,
+              });
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            let [_dates, summary, ...content] = processedRenderedSet;
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              let [_dates, summary, ...content] = processedRenderedSet;
 
-            return summary + content.join('');
-          })
-        : [],
-    };
-  });
+              return summary + content.join('');
+            })
+          : [],
+      };
+    });
+  } else {
+    return [];
+  }
 }

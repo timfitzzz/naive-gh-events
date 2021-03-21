@@ -500,3 +500,9 @@ describe('renderEvents for multiple pull request comment events', () => {
     ]);
   });
 });
+
+describe('renderEvents with bad input', () => {
+  it('should return an empty array when there are no events provided', () => {
+    expect(renderEvents([])).toStrictEqual([]);
+  });
+});
