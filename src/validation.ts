@@ -1,13 +1,5 @@
+import { InvalidResponse, ValidationResponse } from 'types';
 import EventTypes, { GHEvent } from './eventTypes';
-
-export interface ValidationResponse {
-  result: 'valid' | 'partial' | 'invalid';
-  errReason?: string;
-  validEvents?: GHEvent[];
-  invalidEvents?: InvalidResponse[];
-}
-
-export type InvalidResponse = [event: any, explanation: string];
 
 export function getKnownTypes(): string[] {
   return Object.getOwnPropertyNames(EventTypes);

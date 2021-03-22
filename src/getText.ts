@@ -10,9 +10,11 @@ import {
   EntityProps,
   EventPropSet,
   RenderedEventsTextSet,
+  RenderedEventCollectionSet,
+  InvalidResponse,
 } from './types';
 import { getSortedDatedEventCollections } from './collectPropSets';
-import { validateEvents, InvalidResponse } from './validation';
+import { validateEvents } from './validation';
 
 export function renderActorText(
   ActorProps: EventPropSet['actor'],
@@ -347,13 +349,6 @@ function formatContentLine(content: string, indentation: string): string {
 
   return output;
 }
-
-export interface RenderedEventCollectionSet {
-  startDate: string;
-  endDate: string;
-  renderedEventCollections: RenderedEventCollection[];
-}
-export type RenderedEventCollection = string;
 
 export function renderEvents(
   events: GHEvent[],

@@ -144,3 +144,19 @@ export interface SortedDatedEventCollection {
 
 export type DatedEventCollections = DatedEventCollection[];
 export type SortedDatedEventCollections = SortedDatedEventCollection[];
+
+export interface RenderedEventCollectionSet {
+  startDate: string;
+  endDate: string;
+  renderedEventCollections: RenderedEventCollection[];
+}
+export type RenderedEventCollection = string;
+
+export interface ValidationResponse {
+  result: 'valid' | 'partial' | 'invalid';
+  errReason?: string;
+  validEvents?: GHEvent[];
+  invalidEvents?: InvalidResponse[];
+}
+
+export type InvalidResponse = [event: any, explanation: string];
