@@ -242,8 +242,6 @@ export function renderEventPropSetGroup(
       private: privateEvent,
     } = eventPropSets[i];
 
-    console.log(privateEvent);
-
     // the first value in the output set is an array of all the dates
     // of the events included in the rendered set. so let's store the date
     // for this renderedEventPropSet
