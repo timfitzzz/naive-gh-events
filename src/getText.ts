@@ -242,6 +242,8 @@ export function renderEventPropSetGroup(
       private: privateEvent,
     } = eventPropSets[i];
 
+    console.log(privateEvent);
+
     // the first value in the output set is an array of all the dates
     // of the events included in the rendered set. so let's store the date
     // for this renderedEventPropSet
@@ -265,7 +267,7 @@ export function renderEventPropSetGroup(
         reps.target || reps.parent ? ' ' : ''
       }${reps.target ? reps.target + (reps.parent ? ' ' : '') : ''}${
         reps.parent ? reps.parent : ''
-      }${markPrivate ? ' ' + privateMarker : ''}`;
+      }${markPrivate && privateEvent ? ' ' + privateMarker : ''}`;
 
       output[1] = summaryString;
     }

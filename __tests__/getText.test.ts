@@ -509,13 +509,28 @@ describe('renderEvents with bad input', () => {
 
 describe('renderEvents with private events marked', () => {
   let privateEvents = [testData.IssuesEvent.testEvents.closed[0].events[0]];
+  let publicEvents = [
+    { ...testData.IssuesEvent.testEvents.closed[0].events[0] },
+  ].map((e) => {
+    e.public = true;
+    return e;
+  });
 
-  it('should return the proper renderedEventSets including the configured private event marker', () => {
+  it('should return the proper renderedEventSets for a private event including the configured private event marker', () => {
     expect(
       renderEvents(privateEvents, { md: true, markPrivate: true })[0]
         .renderedEventCollections
     ).toStrictEqual([
       '[timfitzzz](https://github.com/timfitzzz) closed issue [set up test mongodb database](https://github.com/timfitzzz/stemmy/issues/13) in [timfitzzz/stemmy](https://github.com/timfitzzz/stemmy) Ꙫ  \r\n\r\n',
+    ]);
+  });
+
+  it('should return the proper renderedEventSets for a public event including the configured private event marker', () => {
+    expect(
+      renderEvents(publicEvents, { md: true, markPrivate: true })[0]
+        .renderedEventCollections
+    ).toStrictEqual([
+      '[timfitzzz](https://github.com/timfitzzz) closed issue [set up test mongodb database](https://github.com/timfitzzz/stemmy/issues/13) in [timfitzzz/stemmy](https://github.com/timfitzzz/stemmy)  \r\n\r\n',
     ]);
   });
 });
