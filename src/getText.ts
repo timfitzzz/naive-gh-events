@@ -31,7 +31,15 @@ export function renderVerbText(verb: EventPropSet['verb']): string {
 
 export function renderEntityText(
   set: Partial<EntityProps> = {},
-  { md }: { md: boolean } = { md: false }
+  {
+    md = defaultNaiveConfig.md,
+    omitLink = false,
+    italicizeLink = false,
+  }: { md?: boolean; omitLink?: boolean; italicizeLink?: boolean } = {
+    md: defaultNaiveConfig.md,
+    omitLink: false,
+    italicizeLink: false,
+  }
 ): string {
   let { id, url, desc, preposition, title } = set;
   let space = ' ';
@@ -45,42 +53,68 @@ export function renderEntityText(
   return "" + // make sure at least an empty string is returned
     (preposition ? preposition + space : "") + // preposition
     ((desc && title) ? desc + space : "") + // if both desc and title, desc
-    (md && url ? "[" : "") + // open link if md and url
-    titleString + // title, or desc, or id
-    (md && url ? "]" : "") + // close link if md and url
-      (md && url ? `(${url})` : "") // url if md and url
+    (md && url && !omitLink ? "[" : "") + // open link if md and url
+    (md && italicizeLink ? '_' : '') + titleString + (md && italicizeLink ? "_" : '') + // title, or desc, or id
+    (md && url && !omitLink ? "]" : "") + // close link if md and url
+      (md && url && !omitLink ? `(${url})` : "") // url if md and url and no omitLink
 }
 
 export const renderSubject = (
   subjectProps: EventPropSet['subject'],
-  { md }: { md: boolean } = { md: false }
+  {
+    md = false,
+    omitLink = false,
+    italicizeLink = false,
+  }: { md?: boolean; omitLink?: boolean; italicizeLink?: boolean } = {
+    md: false,
+    omitLink: false,
+    italicizeLink: false,
+  }
 ): RenderedSubjectAndContent => [
-  renderEntityText(subjectProps, { md }),
+  renderEntityText(subjectProps, { md, omitLink, italicizeLink }),
   subjectProps.content,
 ];
 
 export function getRenderedEventPropSet(
   eventProps: EventPropSet,
   {
-    md = false,
-    dateTimeFormatOptions = DateTime.DATE_FULL,
-  }: Partial<NaiveConfig> = {
-    md: false,
-    dateTimeFormatOptions: DateTime.DATE_FULL,
-  }
+    md = defaultNaiveConfig.md as boolean,
+    dateTimeFormatOptions = defaultNaiveConfig.dateTimeFormatOptions,
+    omitPrivateLinks = defaultNaiveConfig.omitPrivateLinks as boolean,
+    italicizePrivateLinks = defaultNaiveConfig.italicizePrivateLinks as boolean,
+  }: Partial<NaiveConfig> = _.pick(defaultNaiveConfig, [
+    'md',
+    'dateTimeFormatOptions',
+    'omitPrivateLinks',
+    'italicizePrivateLinks',
+  ])
 ): RenderedEventPropSet {
   let date = renderDate(
     eventProps.date,
     dateTimeFormatOptions ? dateTimeFormatOptions : DateTime.DATE_FULL
   ); // make the format a config option
-  let actor = renderActorText(eventProps.actor, { md: md as boolean });
+  let actor = renderActorText(eventProps.actor, { md });
   let verb = renderVerbText(eventProps.verb);
-  let subject = renderSubject(eventProps.subject, { md: md as boolean });
+  let subject = renderSubject(eventProps.subject, {
+    md,
+    omitLink: omitPrivateLinks && eventProps.private ? true : false,
+    italicizeLink: italicizePrivateLinks && eventProps.private ? true : false,
+  });
   let target = eventProps.target
-    ? renderEntityText(eventProps.target, { md: md as boolean })
+    ? renderEntityText(eventProps.target, {
+        md,
+        omitLink: omitPrivateLinks && eventProps.private ? true : false,
+        italicizeLink:
+          italicizePrivateLinks && eventProps.private ? true : false,
+      })
     : undefined;
   let parent = eventProps.parent
-    ? renderEntityText(eventProps.parent, { md: md as boolean })
+    ? renderEntityText(eventProps.parent, {
+        md,
+        omitLink: omitPrivateLinks && eventProps.private ? true : false,
+        italicizeLink:
+          italicizePrivateLinks && eventProps.private ? true : false,
+      })
     : undefined;
 
   return {
@@ -107,8 +141,8 @@ export function renderDatedContent(
   content: string | number | null,
   url: string | null,
   title: string | number | null,
-  { md = false }: Partial<NaiveConfig> = {
-    md: false,
+  { md = false, italicizeLink = false }: { md?: boolean, italicizeLink?: boolean } = {
+    md: false, italicizeLink: false
   }
 ): string {
 
@@ -124,24 +158,24 @@ export function renderDatedContent(
   return  title 
           ? url && content  // date, title, url, content
             ? md 
-              ? `${date} - [${title}](${url}): ${content}`
+              ? `${date} - [${(italicizeLink ? '_' : '') + title + (italicizeLink ? '_' : '')}](${url}): ${content}`
               : `${date} - ${title}: ${content} (${url})`
             : url && !content           // date, title, url
               ? md
-                ? `${date}: [${title}](${url})`
+                ? `${date}: [${(italicizeLink ? '_' : '') + title + (italicizeLink ? '_' : '')}](${url})`
                 : `${date}: ${title} (${url})`
               : content && !url // md and plaintext are the same here
                 ? `${date} - ${title}: ${content}`  // date, title, content
                 : `${date}: ${title}`               // date, title  
           : url && content  // date, url, content
             ? md
-              ? `[${date}](${url}): ${content}`
+              ? `[${(italicizeLink ? '_' : '') + date + (italicizeLink ? '_' : '')}](${url}): ${content}`
               : `${date}: ${content} (${url})`
             : content && !url //date, content
               ? `${date}: ${content}`
               : url && !content 
                 ? md            // date, url
-                  ? `[${date}](${url})`
+                  ? `[${(italicizeLink ? '_' : '') + date + (italicizeLink ? '_' : '')}](${url})`
                   : `${date} (${url})`
                 : `${date}`     // date
 }
@@ -150,11 +184,17 @@ export function renderContent(
   content: string | number,
   url: string | null,
   title: string | number | null,
-  { md = false }: Partial<NaiveConfig> = {
+  {
+    md = false,
+    italicizeLink = false,
+  }: { md?: boolean; italicizeLink?: boolean } = {
     md: false,
+    italicizeLink: false,
   }
 ): string {
-  let output = `${md && url ? '[' : ''}${title ? title : md ? 'item' : ''}${
+  let output = `${md && url ? '[' : ''}${
+    md && url && italicizeLink ? '_' : ''
+  }${title ? title : md ? 'item' : ''}${md && url && italicizeLink ? '_' : ''}${
     md && url ? '](' + url + ')' : ''
   }${content && content !== title ? `: ${content}` : ''}${
     url && !md ? ' (' + url + ')' : ''
@@ -172,12 +212,16 @@ export function renderEventPropSetGroup(
     dateContent = defaultNaiveConfig.dateContent,
     markPrivate = defaultNaiveConfig.markPrivate,
     privateMarker = defaultNaiveConfig.privateMarker,
+    omitPrivateLinks = defaultNaiveConfig.omitPrivateLinks,
+    italicizePrivateLinks = defaultNaiveConfig.italicizePrivateLinks,
   }: Partial<NaiveConfig> = _.pick(defaultNaiveConfig, [
     'md',
     'dateTimeFormatOptions',
     'dateSummaries',
     'dateContent',
     'privateMarker',
+    'omitPrivateLinks',
+    'italicizePrivateLinks',
   ])
 ): RenderedEventsTextSet {
   let output: Partial<RenderedEventsTextSet> = [[]];
@@ -186,6 +230,8 @@ export function renderEventPropSetGroup(
     return getRenderedEventPropSet(eps, {
       md,
       dateTimeFormatOptions,
+      omitPrivateLinks,
+      italicizePrivateLinks,
     });
   });
 
@@ -193,6 +239,7 @@ export function renderEventPropSetGroup(
     let {
       subject: { url, title },
       result,
+      private: privateEvent,
     } = eventPropSets[i];
 
     // the first value in the output set is an array of all the dates
@@ -235,18 +282,18 @@ export function renderEventPropSetGroup(
             renderDatedContent(
               reps.date,
               reps.content || null,
-              url || null,
+              privateEvent && omitPrivateLinks ? null : (url || null),
               title || null,
-              { md }
+              { md, italicizeLink: privateEvent && italicizePrivateLinks ? true : false }
             )
           ) 
         : output.push(    // if we're not dating the content lines:
             eventPropSets.length > 1  // if there are multiple subjects
               ? renderContent(    // render or generate content lines
                   reps.content ? reps.content : title ? title : "",
-                  url ? url : null,
+                  privateEvent && omitPrivateLinks ? null : (url || null),
                   title ? title : null,
-                  { md }
+                  { md, italicizeLink: privateEvent && italicizePrivateLinks ? true : false }
                 ) // if there is just one content prop, return it directly,
                   // since url, title, and/or date will be included in
                   // the subject line.
@@ -337,6 +384,8 @@ export function renderEvents(
     reverseSortEvents = defaultNaiveConfig.reverseSortEvents,
     privateMarker = defaultNaiveConfig.privateMarker,
     markPrivate = defaultNaiveConfig.markPrivate,
+    omitPrivateLinks = defaultNaiveConfig.omitPrivateLinks,
+    italicizePrivateLinks = defaultNaiveConfig.italicizePrivateLinks,
   }: Partial<NaiveConfig> = defaultNaiveConfig
 ): RenderedEventCollectionSet[] {
   const { validEvents, invalidEvents, errReason, result } = validateEvents(
@@ -392,6 +441,8 @@ export function renderEvents(
                 indentContent,
                 markPrivate,
                 privateMarker,
+                omitPrivateLinks,
+                italicizePrivateLinks,
               });
 
               let processedRenderedSet = formatRenderedEventsTextSet(repts, {

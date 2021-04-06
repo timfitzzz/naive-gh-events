@@ -30,6 +30,8 @@ export interface NaiveConfig {
   reverseSortEvents?: boolean;
   markPrivate?: boolean;
   privateMarker?: string;
+  omitPrivateLinks?: boolean;
+  italicizePrivateLinks?: boolean;
 }
 
 export const defaultNaiveConfig: NaiveConfig = {
@@ -48,6 +50,8 @@ export const defaultNaiveConfig: NaiveConfig = {
   reverseSortEvents: false,
   markPrivate: false,
   privateMarker: 'Ꙫ',
+  omitPrivateLinks: false,
+  italicizePrivateLinks: false,
 };
 
 export interface EntityProps {

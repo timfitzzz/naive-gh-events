@@ -54,7 +54,7 @@ Object.getOwnPropertyNames(testData).forEach((testName: string) => {
           testEvent.propSets.forEach((propSet, propSetIndex) => {
             if (propSet.target) {
               it('should return the correct plaintext string for the target', () => {
-                let target = renderEntityText(propSet.target);
+                let target = renderEntityText(propSet.target, { md: false });
 
                 expect(target).toBe(
                   testEvent.renderedPropSets[propSetIndex].plain.target
@@ -72,7 +72,7 @@ Object.getOwnPropertyNames(testData).forEach((testName: string) => {
 
             if (propSet.parent) {
               it('should return the correct plaintext string for the parent', () => {
-                let parent = renderEntityText(propSet.parent);
+                let parent = renderEntityText(propSet.parent, { md: false });
 
                 expect(parent).toBe(
                   testEvent.renderedPropSets[propSetIndex].plain.parent
@@ -93,7 +93,7 @@ Object.getOwnPropertyNames(testData).forEach((testName: string) => {
         describe('renderSubject', () => {
           testEvent.propSets.forEach((propSet, propSetIndex) => {
             const renderedPropSet = testEvent.renderedPropSets[propSetIndex];
-            const plainSubject = renderSubject(propSet.subject);
+            const plainSubject = renderSubject(propSet.subject, { md: false });
             const mdSubject = renderSubject(propSet.subject, { md: true });
 
             it('should return the correct plaintext string for the subject', () => {
@@ -119,7 +119,7 @@ Object.getOwnPropertyNames(testData).forEach((testName: string) => {
           testEvent.propSets.forEach((propSet, propSetIndex) => {
             const renderedPropSet = testEvent.renderedPropSets[propSetIndex];
 
-            const plainRPS = getRenderedEventPropSet(propSet);
+            const plainRPS = getRenderedEventPropSet(propSet, { md: false });
             const mdRPS = getRenderedEventPropSet(propSet, { md: true });
 
             it('should return the correct plain renderedEventPropSet for the event', () => {
@@ -293,7 +293,7 @@ describe('renderDatedContent', () => {
       'content string',
       'https://github.com/timfitzzz',
       'Test Content',
-      { md: false, indentContent: true }
+      { md: false, italicizeLink: false }
     );
 
     expect(output).toBe(
@@ -307,7 +307,7 @@ describe('renderDatedContent', () => {
       'content string',
       'https://github.com/timfitzzz',
       'Test Content',
-      { md: true, indentContent: true }
+      { md: true }
     );
 
     expect(output).toBe(
@@ -321,7 +321,7 @@ describe('renderDatedContent', () => {
       'content string',
       null,
       'Test Content',
-      { md: false, indentContent: true }
+      { md: false }
     );
 
     expect(output).toBe('March 12, 2021 - Test Content: content string');
@@ -333,7 +333,7 @@ describe('renderDatedContent', () => {
       'content string',
       null,
       'Test Content',
-      { md: true, indentContent: true }
+      { md: true }
     );
 
     expect(output).toBe('March 12, 2021 - Test Content: content string');
@@ -532,6 +532,98 @@ describe('renderEvents with private events marked with custom marker', () => {
       })[0].renderedEventCollections
     ).toStrictEqual([
       '[timfitzzz](https://github.com/timfitzzz) closed issue [set up test mongodb database](https://github.com/timfitzzz/stemmy/issues/13) in [timfitzzz/stemmy](https://github.com/timfitzzz/stemmy) (private)  \r\n\r\n',
+    ]);
+  });
+});
+
+describe('renderEvents with omit private links', () => {
+  let privateEvents = [testData.IssuesEvent.testEvents.closed[0].events[0]];
+
+  it('should return the proper renderedEventSets without private links', () => {
+    expect(
+      renderEvents(privateEvents, {
+        md: true,
+        omitPrivateLinks: true,
+      })[0].renderedEventCollections
+    ).toStrictEqual([
+      `[timfitzzz](https://github.com/timfitzzz) closed issue set up test mongodb database in timfitzzz/stemmy  \r\n\r\n`,
+    ]);
+  });
+});
+
+describe('renderEvents with italicize private links', () => {
+  let privateEvents = [testData.IssuesEvent.testEvents.closed[0].events[0]];
+
+  it('should return the proper renderedEventSets with italicized links', () => {
+    expect(
+      renderEvents(privateEvents, {
+        md: true,
+        italicizePrivateLinks: true,
+      })[0].renderedEventCollections
+    ).toStrictEqual([
+      `[timfitzzz](https://github.com/timfitzzz) closed issue [_set up test mongodb database_](https://github.com/timfitzzz/stemmy/issues/13) in [_timfitzzz/stemmy_](https://github.com/timfitzzz/stemmy)  \r\n\r\n`,
+    ]);
+  });
+});
+
+describe('renderEvents with omit and italicize private links', () => {
+  let privateEvents = [testData.IssuesEvent.testEvents.closed[0].events[0]];
+
+  it('should return the proper renderedEventSets with italicized links', () => {
+    expect(
+      renderEvents(privateEvents, {
+        md: true,
+        omitPrivateLinks: true,
+        italicizePrivateLinks: true,
+      })[0].renderedEventCollections
+    ).toStrictEqual([
+      `[timfitzzz](https://github.com/timfitzzz) closed issue _set up test mongodb database_ in _timfitzzz/stemmy_  \r\n\r\n`,
+    ]);
+  });
+});
+
+describe('renderEvents with omit and italicize private links plus display marker', () => {
+  let privateEvents = [testData.IssuesEvent.testEvents.closed[0].events[0]];
+
+  it('should return the proper renderedEventSets with italicized links', () => {
+    expect(
+      renderEvents(privateEvents, {
+        md: true,
+        omitPrivateLinks: true,
+        markPrivate: true,
+        italicizePrivateLinks: true,
+      })[0].renderedEventCollections
+    ).toStrictEqual([
+      `[timfitzzz](https://github.com/timfitzzz) closed issue _set up test mongodb database_ in _timfitzzz/stemmy_ Ꙫ  \r\n\r\n`,
+    ]);
+  });
+});
+
+describe('renderEvents for multiple private pull request comment events with private links omitted and italicized', () => {
+  let multiplePullRequestCommentEvents = [
+    testData.PullRequestReviewCommentEvent.testEvents.created[0].events[0],
+    testData.PullRequestReviewCommentEvent.testEvents.created[0].events[0],
+  ];
+
+  multiplePullRequestCommentEvents = multiplePullRequestCommentEvents.map(
+    (e) => {
+      let event = { ...e };
+      event.public = false;
+      return event;
+    }
+  );
+  it('should return the expected md text', () => {
+    expect(
+      renderEvents(multiplePullRequestCommentEvents, {
+        md: true,
+        omitPrivateLinks: true,
+        markPrivate: true,
+        italicizePrivateLinks: true,
+      })[0].renderedEventCollections
+    ).toStrictEqual([
+      `[paq](https://github.com/paq) added 2 comments on pull request _avm2: Implement ByteArray_ in _ruffle-rs/ruffle_ Ꙫ  \r\n` +
+        '* 575624667: It seems that `coerce_to_string` is necessary here as well.\r\n  \r\n  Test code\r\n  ```as\r\n  import flash.utils.ByteArray;\r\n  import flash.utils.Endian;\r\n  \r\n  class A {\r\n      public function A() {}\r\n      public function toString():String {\r\n          return "shift-jis";\r\n      }\r\n  }\r\n  \r\n  var test = new ByteArray();\r\n  test.writeMultiByte("次", new A());\r\n  test.position = 0;\r\n  trace(test.readMultiByte(2, "shift-jis"));\r\n  ```\r\n  \r\n  Flash player prints `次`.\r\n  Ruffle prints `谺`.\r\n    \r\n' +
+        '* 575624667: It seems that `coerce_to_string` is necessary here as well.\r\n  \r\n  Test code\r\n  ```as\r\n  import flash.utils.ByteArray;\r\n  import flash.utils.Endian;\r\n  \r\n  class A {\r\n      public function A() {}\r\n      public function toString():String {\r\n          return "shift-jis";\r\n      }\r\n  }\r\n  \r\n  var test = new ByteArray();\r\n  test.writeMultiByte("次", new A());\r\n  test.position = 0;\r\n  trace(test.readMultiByte(2, "shift-jis"));\r\n  ```\r\n  \r\n  Flash player prints `次`.\r\n  Ruffle prints `谺`.\r\n    \r\n\r\n',
     ]);
   });
 });
