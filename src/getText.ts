@@ -15,6 +15,7 @@ import {
 } from './types';
 import { getSortedDatedEventCollections } from './collectPropSets';
 import { validateEvents } from './validation';
+import _ from 'lodash';
 
 export function renderActorText(
   ActorProps: EventPropSet['actor'],
@@ -24,42 +25,9 @@ export function renderActorText(
   return `${md ? '[' : ''}${id}${md ? '](' + url + ')' : ''}`;
 }
 
-// export function getActorText(
-//   event: GHEvent,
-//   { md }: { md: boolean } = { md: false }
-// ): string {
-//   let { id, url } = getActorProps(event);
-//   return `${md ? '[' : ''}${id}${md ? '](' + url + ')' : ''}`;
-// }
-
 export function renderVerbText(verb: EventPropSet['verb']): string {
   return verb;
 }
-
-// export function getActorVerbText(
-//   event: GHEvent,
-//   { md }: { md: boolean } = { md: false }
-// ): string | string[] {
-//   let actorText = getActorText(event, { md });
-//   let verbs = getVerbs(event);
-
-//   if (verbs.length > 1) {
-//     return verbs.map((verb) => `${actorText} ${verb}`);
-//   } else {
-//     let verb = verbs[0];
-//     return `${actorText} ${verb}`;
-//   }
-// }
-
-// export function isEntityPlural(entityText: string[][]): boolean {
-//   return (
-//     entityText.length > 1 || entityText.filter((i) => i.length > 2).length > 0
-//   );
-// }
-
-// export function joinEntitySummaries(entityText: string[][]): string {
-//   return entityText.map((item) => item[0]).join(', ');
-// }
 
 export function renderEntityText(
   set: Partial<EntityProps> = {},
@@ -162,7 +130,7 @@ export function renderDatedContent(
               ? md
                 ? `${date}: [${title}](${url})`
                 : `${date}: ${title} (${url})`
-              : content && !url
+              : content && !url // md and plaintext are the same here
                 ? `${date} - ${title}: ${content}`  // date, title, content
                 : `${date}: ${title}`               // date, title  
           : url && content  // date, url, content
@@ -176,20 +144,6 @@ export function renderDatedContent(
                   ? `[${date}](${url})`
                   : `${date} (${url})`
                 : `${date}`     // date
-          
-  // if (title && url && content) {
-  //   return md ? `${date} - [${title}](${url}): ${content}` : `${date} - ${title}: ${content} (${url})`
-  // } else if ()
-
-  // let intro = `${title ? date + ' - ' : ''}`
-
-  // let output = `${title ? date + ' - ' : ''}${md && url ? '[' : ''}${
-  //   title ? title : date
-  // }${md && url ? '](' + url + '): ' : ': '}${content}${
-  //   url && !md ? ' (' + url + ')' : ''
-  // }`;
-
-  // return output;
 }
 
 export function renderContent(
@@ -216,12 +170,15 @@ export function renderEventPropSetGroup(
     dateTimeFormatOptions = defaultNaiveConfig.dateTimeFormatOptions,
     dateSummaries = defaultNaiveConfig.dateSummaries,
     dateContent = defaultNaiveConfig.dateContent,
-  }: Partial<NaiveConfig> = {
-    md: false,
-    dateTimeFormatOptions: DateTime.DATE_FULL,
-    dateSummaries: false,
-    dateContent: false,
-  }
+    markPrivate = defaultNaiveConfig.markPrivate,
+    privateMarker = defaultNaiveConfig.privateMarker,
+  }: Partial<NaiveConfig> = _.pick(defaultNaiveConfig, [
+    'md',
+    'dateTimeFormatOptions',
+    'dateSummaries',
+    'dateContent',
+    'privateMarker',
+  ])
 ): RenderedEventsTextSet {
   let output: Partial<RenderedEventsTextSet> = [[]];
 
@@ -238,13 +195,19 @@ export function renderEventPropSetGroup(
       result,
     } = eventPropSets[i];
 
+    // the first value in the output set is an array of all the dates
+    // of the events included in the rendered set. so let's store the date
+    // for this renderedEventPropSet
     output[0] && output[0].push(reps.date);
 
+    // the first eventPropSet, and knowledge of the number of sets
+    // in this eventPropSetGroup, give us the info we need to construct
+    // the first line of output text.
     if (i === 0) {
       const summaryString = `${dateSummaries ? reps.date + ': ' : ''}${
         reps.actor
-      } ${reps.verb}${
-        eventPropSets.length > 1 ? ` ${eventPropSets.length} ` : ' '
+      } ${reps.verb} ${
+        eventPropSets.length > 1 ? `${eventPropSets.length} ` : ''
       }${
         typeof result === 'string'
           ? result
@@ -255,10 +218,14 @@ export function renderEventPropSetGroup(
         reps.target || reps.parent ? ' ' : ''
       }${reps.target ? reps.target + (reps.parent ? ' ' : '') : ''}${
         reps.parent ? reps.parent : ''
-      }`;
+      }${markPrivate ? ' ' + privateMarker : ''}`;
 
       output[1] = summaryString;
     }
+
+    // if this renderedEventPropSet has content, or there is more than one
+    // prop set in the group, we're going to render the content and/or
+    // the details of each set's subject on subsequent lines of text.
 
     // prettier-ignore
     if (reps.content || eventPropSets.length > 1) { 
@@ -280,7 +247,9 @@ export function renderEventPropSetGroup(
                   url ? url : null,
                   title ? title : null,
                   { md }
-                ) // if there is just one content prop, return it directly
+                ) // if there is just one content prop, return it directly,
+                  // since url, title, and/or date will be included in
+                  // the subject line.
               : reps.content
           )
     }
@@ -366,21 +335,9 @@ export function renderEvents(
     dateTimeFormatOptions = defaultNaiveConfig.dateTimeFormatOptions,
     newLinesBetween = defaultNaiveConfig.newLinesBetween,
     reverseSortEvents = defaultNaiveConfig.reverseSortEvents,
-  }: Partial<NaiveConfig> = {
-    sortBy: 'date',
-    groupByDays: 7,
-    groupStartDay: 0,
-    dateSummaries: false,
-    dateContent: true,
-    collapse: true,
-    md: true,
-    startDate: new Date('1/1/1970'),
-    omitContent: false,
-    indentContent: true,
-    dateTimeFormatOptions: DateTime.DATE_FULL,
-    newLinesBetween: true,
-    reverseSortEvents: false,
-  }
+    privateMarker = defaultNaiveConfig.privateMarker,
+    markPrivate = defaultNaiveConfig.markPrivate,
+  }: Partial<NaiveConfig> = defaultNaiveConfig
 ): RenderedEventCollectionSet[] {
   const { validEvents, invalidEvents, errReason, result } = validateEvents(
     events
@@ -407,6 +364,7 @@ export function renderEvents(
         groupStartDay,
         startDate,
         reverseSortEvents,
+        markPrivate,
       }
     ) as SortedDatedEventCollections;
 
@@ -417,12 +375,6 @@ export function renderEvents(
         startDate: startDate
           ? renderDate(startDate, dateTimeFormatOptions)
           : '',
-        // startDate:
-        //   typeof startDate === "string"
-        //     ? startDate
-        //     : startDate
-        //     ? renderDate(startDate, dateTimeFormatOptions)
-        //     : "",
         endDate:
           typeof endDate === 'string'
             ? endDate
@@ -438,6 +390,8 @@ export function renderEvents(
                 dateContent,
                 omitContent,
                 indentContent,
+                markPrivate,
+                privateMarker,
               });
 
               let processedRenderedSet = formatRenderedEventsTextSet(repts, {

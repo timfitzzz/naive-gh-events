@@ -506,3 +506,32 @@ describe('renderEvents with bad input', () => {
     expect(renderEvents([])).toStrictEqual([]);
   });
 });
+
+describe('renderEvents with private events marked', () => {
+  let privateEvents = [testData.IssuesEvent.testEvents.closed[0].events[0]];
+
+  it('should return the proper renderedEventSets including the configured private event marker', () => {
+    expect(
+      renderEvents(privateEvents, { md: true, markPrivate: true })[0]
+        .renderedEventCollections
+    ).toStrictEqual([
+      '[timfitzzz](https://github.com/timfitzzz) closed issue [set up test mongodb database](https://github.com/timfitzzz/stemmy/issues/13) in [timfitzzz/stemmy](https://github.com/timfitzzz/stemmy) Ꙫ  \r\n\r\n',
+    ]);
+  });
+});
+
+describe('renderEvents with private events marked with custom marker', () => {
+  let privateEvents = [testData.IssuesEvent.testEvents.closed[0].events[0]];
+
+  it('should return the proper renderedEventSets including the configured private event marker', () => {
+    expect(
+      renderEvents(privateEvents, {
+        md: true,
+        markPrivate: true,
+        privateMarker: '(private)',
+      })[0].renderedEventCollections
+    ).toStrictEqual([
+      '[timfitzzz](https://github.com/timfitzzz) closed issue [set up test mongodb database](https://github.com/timfitzzz/stemmy/issues/13) in [timfitzzz/stemmy](https://github.com/timfitzzz/stemmy) (private)  \r\n\r\n',
+    ]);
+  });
+});

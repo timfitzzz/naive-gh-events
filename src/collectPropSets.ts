@@ -9,7 +9,10 @@ import {
 } from './types';
 const _ = require('lodash');
 
-export function groupEventPropSets(evps: EventPropSet[]): EventPropSet[][] {
+export function groupEventPropSets(
+  evps: EventPropSet[],
+  { markPrivate }: { markPrivate?: boolean } = { markPrivate: false }
+): EventPropSet[][] {
   return evps.reduce(
     (acc, set, index) => {
       let { done } = acc;
@@ -22,7 +25,8 @@ export function groupEventPropSets(evps: EventPropSet[]): EventPropSet[][] {
               _.isEqual(set.actionType, innerSet.actionType) &&
               _.isEqual(set.actor, innerSet.actor) &&
               _.isEqual(set.target, innerSet.target) &&
-              _.isEqual(set.parent, innerSet.parent)
+              _.isEqual(set.parent, innerSet.parent) &&
+              (markPrivate ? _.isEqual(set.private, innerSet.private) : true)
             ) {
               done.push(innerIndex);
               return true;
@@ -346,7 +350,8 @@ export function getSortedDatedEventCollections(
     groupStartDay,
     startDate,
     reverseSortEvents,
-  }: NaiveConfig
+    markPrivate,
+  }: Partial<NaiveConfig>
 ): SortedDatedEventCollections {
   let output: SortedDatedEventCollections | DatedEventCollections = [];
 
@@ -390,7 +395,9 @@ export function getSortedDatedEventCollections(
   if (collapse) {
     output = output.map((eventCollection) => ({
       ...eventCollection,
-      eventPropSetGroups: groupEventPropSets(eventCollection.eventPropSets),
+      eventPropSetGroups: groupEventPropSets(eventCollection.eventPropSets, {
+        markPrivate,
+      }),
     })) as SortedDatedEventCollections;
   } else {
     output = output.map((eventCollection) => ({

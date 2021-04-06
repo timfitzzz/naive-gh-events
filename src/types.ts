@@ -14,6 +14,42 @@ export type GithubPullRequestReview = Endpoints['GET /repos/{owner}/{repo}/pulls
 export type GithubRelease = Endpoints['GET /repos/{owner}/{repo}/releases/{release_id}']['response']['data'];
 export type GithubCommitComment = Endpoints['GET /repos/{owner}/{repo}/commits/{commit_sha}/comments']['response']['data'][0];
 
+export interface NaiveConfig {
+  sortBy?: 'date' | 'actor' | 'type' | 'target' | 'parent';
+  collapse?: boolean;
+  dateSummaries?: boolean;
+  dateContent?: boolean;
+  groupByDays?: number;
+  groupStartDay?: number;
+  startDate?: Date;
+  md?: boolean;
+  omitContent?: boolean;
+  indentContent?: boolean;
+  dateTimeFormatOptions?: LocaleOptions;
+  newLinesBetween?: boolean;
+  reverseSortEvents?: boolean;
+  markPrivate?: boolean;
+  privateMarker?: string;
+}
+
+export const defaultNaiveConfig: NaiveConfig = {
+  sortBy: 'date',
+  collapse: true,
+  groupByDays: 7,
+  groupStartDay: 0,
+  dateSummaries: false,
+  dateContent: false,
+  startDate: new Date('1/1/1970'),
+  md: true,
+  omitContent: false,
+  indentContent: true,
+  dateTimeFormatOptions: DateTime.DATE_FULL,
+  newLinesBetween: true,
+  reverseSortEvents: false,
+  markPrivate: false,
+  privateMarker: 'Ꙫ',
+};
+
 export interface EntityProps {
   id: number | string;
   url: string | undefined;
@@ -75,38 +111,6 @@ export type TestEvents = TestEventsByActionType;
 export interface TypeTestData {
   testEvents: TestEvents;
 }
-
-export interface NaiveConfig {
-  sortBy?: 'date' | 'actor' | 'type' | 'target' | 'parent';
-  collapse?: boolean;
-  dateSummaries?: boolean;
-  dateContent?: boolean;
-  groupByDays?: number;
-  groupStartDay?: number;
-  startDate?: Date;
-  md?: boolean;
-  omitContent?: boolean;
-  indentContent?: boolean;
-  dateTimeFormatOptions?: LocaleOptions;
-  newLinesBetween?: boolean;
-  reverseSortEvents?: boolean;
-}
-
-export const defaultNaiveConfig: NaiveConfig = {
-  sortBy: 'date',
-  collapse: true,
-  groupByDays: 7,
-  groupStartDay: 0,
-  dateSummaries: false,
-  dateContent: false,
-  startDate: new Date('1/1/1970'),
-  md: true,
-  omitContent: false,
-  indentContent: true,
-  dateTimeFormatOptions: DateTime.DATE_FULL,
-  newLinesBetween: true,
-  reverseSortEvents: false,
-};
 
 export type RenderedSubjectAndContent = [subject: string, content?: string];
 export type RenderedEventPropSetText = [
