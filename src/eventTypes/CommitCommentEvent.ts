@@ -1,4 +1,4 @@
-import { GithubCommitComment } from '../types';
+import { GithubCommitComment } from './';
 import { GithubEventType } from './helperTypes';
 
 const CommitCommentEvent: GithubEventType = {

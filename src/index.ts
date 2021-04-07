@@ -1,5 +1,5 @@
-import { renderEvents } from './getText';
-export * from './getText';
+import { renderEvents } from './renderText';
+export * from './renderText';
 export * from './eventTypes';
 export * from './types';
 

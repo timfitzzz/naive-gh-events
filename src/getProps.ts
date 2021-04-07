@@ -1,11 +1,11 @@
 import { EntityProps, EventPropSet } from './types';
 import EventTypes, { GHEvent, GHEventPayloadIteree } from './eventTypes';
 import {
-  EntityRef,
+  EntityPaths,
   GithubEventType,
   IndexedResultDef,
   resultDef,
-} from './eventTypes/helperTypes';
+} from './eventTypes';
 const _ = require('lodash');
 
 export function fixUrl(url: string): string | null {
@@ -99,20 +99,18 @@ export function getVerbs<K extends GHEvent>(
 export function getResultTexts(
   eventType: string,
   actionType?: string | null
-): string | [string, string] {
-  const resultSet: string | resultDef | IndexedResultDef =
+): [string, string] {
+  const resultSet: resultDef | IndexedResultDef =
     EventTypes[eventType].paths.result;
 
   // console.log(resultSet)
   // console.log(EventTypes[eventType])
-  if (typeof resultSet === 'string') {
-    return resultSet;
-  } else if (Array.isArray(resultSet)) {
+  if (Array.isArray(resultSet)) {
     return resultSet;
   } else if (actionType && resultSet[actionType]) {
     return resultSet[actionType];
   } else {
-    return 'item';
+    return ['item', 'item'];
   }
 }
 
@@ -139,7 +137,7 @@ export function getActorProps(event: GHEvent): { id: string; url: string } {
   }
 }
 
-function pathsToProps(obj: object, paths: EntityRef): EntityProps {
+function pathsToProps(obj: object, paths: EntityPaths): EntityProps {
   // console.log(paths)
   // paths.id === "page_name" && console.log("processing obj: ", obj)
   // paths.id === "page_name" && console.log("getting paths ", paths)
@@ -162,7 +160,7 @@ function pathsToProps(obj: object, paths: EntityRef): EntityProps {
 export function getSubjectPropSets(event: GHEvent): EntityProps[] {
   // console.log(event.type)
   // console.log(EventTypes[event.type])
-  const subjectPaths: EntityRef | { [key: string]: EntityRef } =
+  const subjectPaths: EntityPaths | { [key: string]: EntityPaths } =
     EventTypes[event.type].paths.subject;
   const { iterator, actionTypes } = EventTypes[event.type].config;
 
@@ -179,7 +177,7 @@ export function getSubjectPropSets(event: GHEvent): EntityProps[] {
               subject as object,
               subjectPaths[(lookupActionTypes(event, i) as string[])[0]]
             )
-          : pathsToProps(subject as object, subjectPaths as EntityRef);
+          : pathsToProps(subject as object, subjectPaths as EntityPaths);
       });
     } else {
       // in this case, there are not multiple subjects.
@@ -190,8 +188,8 @@ export function getSubjectPropSets(event: GHEvent): EntityProps[] {
           : null;
       output = [
         actionTypes && eventActionType && !subjectPaths.id
-          ? pathsToProps(event, subjectPaths[eventActionType] as EntityRef)
-          : pathsToProps(event, subjectPaths as EntityRef),
+          ? pathsToProps(event, subjectPaths[eventActionType] as EntityPaths)
+          : pathsToProps(event, subjectPaths as EntityPaths),
       ];
     }
   }
@@ -204,7 +202,7 @@ export function getEntityProps(
   actionType?: string
 ): EntityProps | undefined {
   // console.dir(event.type + " " + entityType + " " + actionType)
-  const entityPaths: EntityRef | { [key: string]: EntityRef } =
+  const entityPaths: EntityPaths | { [key: string]: EntityPaths } =
     EventTypes[event.type].paths[entityType];
 
   // const { iterator } = EventTypes[event.type].config
@@ -215,13 +213,13 @@ export function getEntityProps(
     if (typeof entityPaths.id === 'undefined') {
       if (actionType && entityPaths[actionType]) {
         // for entities with multiple action types:
-        // entityPaths = { [key: string]: EntityRef }
+        // entityPaths = { [key: string]: EntityPaths }
         output = pathsToProps(event, entityPaths[actionType]);
       } else {
         output = undefined;
       }
     } else {
-      output = pathsToProps(event, entityPaths as EntityRef);
+      output = pathsToProps(event, entityPaths as EntityPaths);
     }
   }
 

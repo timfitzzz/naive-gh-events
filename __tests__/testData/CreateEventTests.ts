@@ -1,5 +1,5 @@
 import { isUndefined } from 'lodash';
-import { TypeTestData } from '../../src/types';
+import { TypeTestData } from './';
 
 const CreateEventTests: TypeTestData = {
   testEvents: {

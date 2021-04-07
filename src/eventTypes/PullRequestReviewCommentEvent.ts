@@ -1,4 +1,4 @@
-import { GithubPullRequest, GithubPullRequestComment } from '../types';
+import { GithubPullRequest, GithubPullRequestComment } from './';
 import {
   GithubEventType,
   repoParentPaths,

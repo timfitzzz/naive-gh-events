@@ -5,7 +5,6 @@ import {
   defaultNaiveConfig,
   NaiveConfig,
   RenderedEventPropSet,
-  RenderedSubjectAndContent,
   SortedDatedEventCollections,
   EntityProps,
   EventPropSet,
@@ -70,10 +69,7 @@ export const renderSubject = (
     omitLink: false,
     italicizeLink: false,
   }
-): RenderedSubjectAndContent => [
-  renderEntityText(subjectProps, { md, omitLink, italicizeLink }),
-  subjectProps.content,
-];
+): string => renderEntityText(subjectProps, { md, omitLink, italicizeLink });
 
 export function getRenderedEventPropSet(
   eventProps: EventPropSet,
@@ -121,8 +117,8 @@ export function getRenderedEventPropSet(
     date,
     actor,
     verb,
-    subject: subject[0],
-    content: subject[1],
+    subject,
+    content: eventProps.subject.content,
     target,
     parent,
   };

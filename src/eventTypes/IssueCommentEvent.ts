@@ -1,4 +1,4 @@
-import { GithubIssue, GithubEvent } from '../types';
+import { GithubIssue, GithubEvent } from './';
 import { GithubEventType } from './helperTypes';
 
 const IssueCommentEvent: GithubEventType = {

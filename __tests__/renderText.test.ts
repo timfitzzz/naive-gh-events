@@ -1,5 +1,5 @@
 import EventTypes, { GHEvent } from '../src/eventTypes';
-import testData from './testData';
+import testData, { TestEvent } from './testData';
 import {
   getRenderedEventPropSet,
   renderDatedContent,
@@ -7,8 +7,8 @@ import {
   renderEventPropSetGroup,
   renderEvents,
   renderSubject,
-} from '../src/getText';
-import { RenderedEventsTextSet, TestEvent } from '../src/types';
+} from '../src/renderText';
+import { RenderedEventsTextSet } from '../src/types';
 import { getSortedDatedEventCollections } from '../src/collectPropSets';
 import allEventsOutput from './testData/allEventsOutput';
 
@@ -97,20 +97,11 @@ Object.getOwnPropertyNames(testData).forEach((testName: string) => {
             const mdSubject = renderSubject(propSet.subject, { md: true });
 
             it('should return the correct plaintext string for the subject', () => {
-              expect(plainSubject[0]).toBe(renderedPropSet.plain.subject);
+              expect(plainSubject).toBe(renderedPropSet.plain.subject);
             });
 
             it('should return the correct markdown string for the subject', () => {
-              expect(mdSubject[0]).toBe(renderedPropSet.md.subject);
-            });
-
-            it('should return the same raw content string regardless of format', () => {
-              expect(plainSubject[1]).toBe(mdSubject[1]);
-            });
-
-            it('should return the correct content values', () => {
-              expect(plainSubject[1]).toBe(renderedPropSet.plain.content);
-              expect(mdSubject[1]).toBe(renderedPropSet.md.content);
+              expect(mdSubject).toBe(renderedPropSet.md.subject);
             });
           });
         });

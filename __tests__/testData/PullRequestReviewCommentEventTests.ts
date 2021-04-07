@@ -1,4 +1,4 @@
-import { TypeTestData } from '../../src/types';
+import { TypeTestData } from './';
 
 const PullRequestReviewCommentEventTests: TypeTestData = {
   testEvents: {
