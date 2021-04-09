@@ -134,7 +134,6 @@ Object.getOwnPropertyNames(testData).forEach((testName: string) => {
           });
 
           expect(sdecCollapsed.length).toBe(1);
-          // console.dir(sdecCollapsed)
 
           let plainCollapsedRenderedEventsTextSets: RenderedEventsTextSet[] = sdecCollapsed.reduce(
             (acc, sdecc) => {
@@ -184,7 +183,6 @@ Object.getOwnPropertyNames(testData).forEach((testName: string) => {
 
           it('should return the correct plain rendered events text sets for the prop sets of this single event', () => {
             plainCollapsedRenderedEventsTextSets.forEach((pcrets, i) => {
-              // console.log(pcrets)
               expect(pcrets).toStrictEqual(
                 testEvent.renderedEventsTextSets.collapsed[i].plain
               );
@@ -193,7 +191,6 @@ Object.getOwnPropertyNames(testData).forEach((testName: string) => {
 
           it('should return the correct md rendered events text sets for the prop sets of this single event', () => {
             mdCollapsedRenderedEventsTextSets.forEach((pcrets, i) => {
-              // console.log(pcrets)
               expect(pcrets).toStrictEqual(
                 testEvent.renderedEventsTextSets.collapsed[i].md
               );
@@ -210,14 +207,6 @@ Object.getOwnPropertyNames(testData).forEach((testName: string) => {
 
             expect(plainEvents.length).toBe(1);
             expect(mdEvents.length).toBe(1);
-
-            // plainEvents.forEach((recs) => {
-            //   console.dir(recs.renderedEventCollections)
-            // })
-
-            // mdEvents.forEach((recs) => {
-            //   console.dir(recs.renderedEventCollections)
-            // })
           });
         });
       });
@@ -375,15 +364,7 @@ describe('renderEvents for all event sets', () => {
 
     expect(plainEvents.length).toBe(7);
 
-    // plainEvents.forEach((recs, i) => {
-    //   fs.writeFileSync(
-    //     "./io-collector/naive-gh-events-to-md/__tests__/outputs/plain" + i,
-    //     JSON.stringify(recs.renderedEventCollections.join(""))
-    //   )
-    // })
-
     plainEvents.forEach((recs, i) => {
-      // console.log(recs.renderedEventCollections.join(""))
       expect(recs.renderedEventCollections.join('')).toBe(
         allEventsOutput.default.plain[i]
       );
@@ -399,15 +380,7 @@ describe('renderEvents for all event sets', () => {
 
     expect(mdEvents.length).toBe(7);
 
-    // mdEvents.forEach((recs, i) => {
-    //   fs.writeFileSync(
-    //     "./io-collector/naive-gh-events-to-md/__tests__/outputs/md" + i,
-    //     JSON.stringify(recs.renderedEventCollections.join(""))
-    //   )
-    // })
-
     mdEvents.forEach((recs, i) => {
-      // console.log(recs.renderedEventCollections.join(""))
       expect(recs.renderedEventCollections.join('')).toBe(
         allEventsOutput.default.md[i]
       );

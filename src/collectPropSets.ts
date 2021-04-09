@@ -280,7 +280,6 @@ export function sortEventPropSetGroups(
       } else if (!b && !a) {
         return 0;
       } else {
-        // sortBy === 'target' && console.log(a, b);
         let result = !reverseSortEvents
           ? a!.toString().localeCompare(b!.toString())
           : b!.toString().localeCompare(a!.toString());
