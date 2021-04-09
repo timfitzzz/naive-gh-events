@@ -9,6 +9,7 @@ import {
 } from './types';
 const _ = require('lodash');
 
+// groupEventPropSets: collect EPSes that differ only by subject
 export function groupEventPropSets(
   evps: EventPropSet[],
   { markPrivate }: { markPrivate?: boolean } = { markPrivate: false }
@@ -44,28 +45,27 @@ export function groupEventPropSets(
   ).sets;
 }
 
+// dayNameToNumber: utility function
 function dayNameToNumber(dayName: string): number {
-  dayName = dayName.toLowerCase();
-
-  const dayNames = {
-    sunday: 0,
-    monday: 1,
-    tuesday: 2,
-    wednesday: 3,
-    thursday: 4,
-    friday: 5,
-    saturday: 6,
-  };
-
-  return dayNames[dayName] || 0;
+  return (
+    {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+    }[dayName.toLowerCase()] || 0
+  );
 }
 
+// initializeStartWeekday: utility function
 function initializeStartWeekday(startWeekday: number | string): number {
   if (typeof startWeekday == 'string') {
     // convert string
     return dayNameToNumber(startWeekday);
   } else if (startWeekday !== -1) {
-    //
     // handle numbers over 7 and non-integers
     return Math.floor(startWeekday % 7);
   } else {
@@ -73,6 +73,7 @@ function initializeStartWeekday(startWeekday: number | string): number {
   }
 }
 
+// initializeStartDate: determine the start date of the first collection of events.
 function initializeStartDate(startWeekday: number, firstEventDate: Date): Date {
   // if start weekday is a thing, we should move the start date to match
   // the first such weekday prior to the first event in the date range.
@@ -90,6 +91,8 @@ function initializeStartDate(startWeekday: number, firstEventDate: Date): Date {
   }
 }
 
+// initializeNextCollection: helps collectEventsByDate to start a new collection, skipping any time that does not
+//                           contain events.
 function initializeNextCollection(
   currentCollection: DatedEventCollection,
   nextEvent: EventPropSet,
@@ -130,6 +133,8 @@ function initializeNextCollection(
   };
 }
 
+// collectEventsByDate: collect events within a timespan as directed by groupByDays,
+//                      startDate, and startWeekday options.
 export function collectEventsByDate(
   evps: EventPropSet[], // array of event props
   startDate: Date, // earliest date to include
@@ -143,7 +148,6 @@ export function collectEventsByDate(
   let collectionLengthMs = days * 86400000; // ms in a day
 
   startWeekday = initializeStartWeekday(startWeekday);
-  // console.log(startWeekday)
   const evpsByDate = [...evps]
     .filter((evp) => evp.date.getTime() >= startDate.getTime())
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -158,7 +162,6 @@ export function collectEventsByDate(
       // run through evps and sort into collections
       (acc, evp) => {
         let { collections } = acc;
-        // console.dir(collections)
         let openCollection = collections[
           collections.length - 1
         ] as DatedEventCollection; // work on the current collection (last in string)
@@ -170,9 +173,6 @@ export function collectEventsByDate(
           openCollection.startDate &&
           evp.date.getTime() <= openCollection.endDate.getTime()
         ) {
-          // console.log(
-          //   `${evp.date.getTime()} is between ${openCollection.startDate.getTime()} and ${openCollection.endDate.getTime()}`
-          // )
           if (openCollection && openCollection.eventPropSets) {
             openCollection.eventPropSets.push(evp);
           }
@@ -188,8 +188,6 @@ export function collectEventsByDate(
           newCollection && collections.push(newCollection);
         }
 
-        // start a new collection
-        //}
         return acc;
       },
       {
@@ -206,7 +204,9 @@ export function collectEventsByDate(
     )
     .collections.filter((collection) => collection.eventPropSets.length > 0);
 
-  // i
+  // if there is output and the final collection has no endDate,
+  // either date it according to the timespan defined by config
+  // or set its endDate to now.
   if (output.length > 0 && output[output.length - 1].endDate === null) {
     let lastGroup = output[output.length - 1] as DatedEventCollection;
     if (
@@ -224,6 +224,7 @@ export function collectEventsByDate(
   return output;
 }
 
+// sortEventPropSetGroups: sort grouped EventPropSets by the sortBy config option
 export function sortEventPropSetGroups(
   epsgs: EventPropSet[][],
   sortBy: string,
@@ -251,7 +252,6 @@ export function sortEventPropSetGroups(
 
   if (sortPaths) {
     return [...epsgs].sort((epsgA, epsgB) => {
-      // console.log(sortPath);
       let a: string | number | undefined = undefined;
       let b: string | number | undefined = undefined;
 
@@ -274,65 +274,16 @@ export function sortEventPropSetGroups(
 
         b = sp0ResultB || sp1ResultB;
       }
-      //   _.get(epsgA[0], sortPaths![0]) || sortPaths![1]
-      //     ? _.get(epsgA[0], sortPaths![1])
-      //     : undefined;
-      // let b =
-      //   _.get(epsgB[0], sortPaths![0]) || sortPaths![1]
-      //     ? _.get(epsgB[0], sortPaths![1])
-      //     : undefined;
 
       if ((a && !b) || (b && !a)) {
-        // console.log(`
-        //   sortBy: ${sortBy}
-        //   reverseSortEvents: ${reverseSortEvents}
-        //   sortPaths: ${sortPaths}
-        //   epsgA: ${JSON.stringify(epsgA)}
-        //   epsgA shortpath1 result: ${_.get(epsgA[0], sortPaths![0])}
-        //   epsgA shortpath2 result: ${_.get(epsgA[0], sortPaths![1])}
-        //   a: ${a}
-        //   epsgB: ${JSON.stringify(epsgB)}
-        //   epsgB shortpath1 result: ${_.get(epsgB[0], sortPaths![0])}
-        //   epsgB shortpath2 result: ${_.get(epsgB[0], sortPaths![1])}
-        //   b: ${b}
-        //   result: 1 is undefined, so it's 1
-        // `);
         return 1;
       } else if (!b && !a) {
-        //   console.log(`
-        //   sortBy: ${sortBy}
-        //   reverseSortEvents: ${reverseSortEvents}
-        //   sortPaths: ${sortPaths}
-        //   epsgA: ${JSON.stringify(epsgA)}
-        //   epsgA shortpath1 result: ${_.get(epsgA[0], sortPaths![0])}
-        //   epsgA shortpath2 result: ${_.get(epsgA[0], sortPaths![1])}
-        //   a: ${a}
-        //   epsgB: ${JSON.stringify(epsgB)}
-        //   epsgB shortpath1 result: ${_.get(epsgB[0], sortPaths![0])}
-        //   epsgB shortpath2 result: ${_.get(epsgB[0], sortPaths![1])}
-        //   b: ${b}
-        //   result: both undefined, so it's 0
-        // `);
         return 0;
       } else {
         // sortBy === 'target' && console.log(a, b);
         let result = !reverseSortEvents
           ? a!.toString().localeCompare(b!.toString())
           : b!.toString().localeCompare(a!.toString());
-        // console.log(`
-        //   sortBy: ${sortBy}
-        //   reverseSortEvents: ${reverseSortEvents}
-        //   sortPaths: ${sortPaths}
-        //   epsgA: ${JSON.stringify(epsgA)}
-        //   epsgA shortpath1 result: ${_.get(epsgA[0], sortPaths![0])}
-        //   epsgA shortpath2 result: ${_.get(epsgA[0], sortPaths![1])}
-        //   a: ${a}
-        //   epsgB: ${JSON.stringify(epsgB)}
-        //   epsgB shortpath1 result: ${_.get(epsgB[0], sortPaths![0])}
-        //   epsgB shortpath2 result: ${_.get(epsgB[0], sortPaths![1])}
-        //   b: ${b}
-        //   result: ${result}
-        // `);
         return result;
       }
     });
@@ -341,6 +292,8 @@ export function sortEventPropSetGroups(
   }
 }
 
+// getSortedDatedEventCollection: the main interface for collectPropSets. Takes in events and
+// returns SortedDatedEventCollections ready to be processed by renderEvents.
 export function getSortedDatedEventCollections(
   events: GHEvent[],
   {
@@ -408,10 +361,7 @@ export function getSortedDatedEventCollections(
 
   // sort by non-date fields
   if (sortBy && sortBy !== 'date') {
-    // console.dir('sorting by non-date field ' + sortBy);
-
     output = output.map((sdec) => {
-      // console.log(sdec.eventPropSetGroups);
       let sortedSdec = {
         // SortedDatedEventCollection
         ...sdec,
@@ -425,18 +375,5 @@ export function getSortedDatedEventCollections(
       return sortedSdec;
     });
   }
-
-  // console.log(output);
-
-  // if (sortBy && sortBy !== 'date') {
-  //   // should already be sorted by date
-  //   output = output.map((refinedEventCollection) => ({
-  //     ...refinedEventCollection,
-  //     eventPropSetGroups: refinedEventCollection.eventPropSetGroups.sort(
-  //       (epsgroupA, epsgroupB) => epsgroupA[0][sortBy] - epsgroupB[0][sortBy]
-  //     ),
-  //   }));
-  // }
-
   return output as SortedDatedEventCollections;
 }

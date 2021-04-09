@@ -16,6 +16,7 @@ import { getSortedDatedEventCollections } from './collectPropSets';
 import { validateEvents } from './validation';
 import _ from 'lodash';
 
+// renderActorText: generate text output from actor props, either md or plaintext
 export function renderActorText(
   ActorProps: EventPropSet['actor'],
   { md }: { md: boolean } = { md: false }
@@ -24,10 +25,18 @@ export function renderActorText(
   return `${md ? '[' : ''}${id}${md ? '](' + url + ')' : ''}`;
 }
 
+// renderVerbText: generate verb output from verb props.
+//                 - functionally, this doesn't need to be a separate function, but it's here to
+//                   underscore that text is rendered by moving through each part of the EventPropSet.
 export function renderVerbText(verb: EventPropSet['verb']): string {
   return verb;
 }
 
+// renderEntityText: generate text output from entityprops.
+//                   - options:
+//                     - md or planitext
+//                     - include or omit hyperlinks
+//                     - italicize or don't italicize hyperlinks in markdown.
 export function renderEntityText(
   set: Partial<EntityProps> = {},
   {
@@ -58,6 +67,11 @@ export function renderEntityText(
       (md && url && !omitLink ? `(${url})` : "") // url if md and url and no omitLink
 }
 
+// renderSubject: generate text output for subject props.
+//                   - options:
+//                     - md or planitext
+//                     - include or omit hyperlinks
+//                     - italicize or don't italicize hyperlinks in markdown.
 export const renderSubject = (
   subjectProps: EventPropSet['subject'],
   {
@@ -71,6 +85,7 @@ export const renderSubject = (
   }
 ): string => renderEntityText(subjectProps, { md, omitLink, italicizeLink });
 
+// getRenderedEventPropSet: generate and collect rendered text for an entire EventPropSet
 export function getRenderedEventPropSet(
   eventProps: EventPropSet,
   {
@@ -124,6 +139,7 @@ export function getRenderedEventPropSet(
   };
 }
 
+// renderDate: generate text for date according to provided date formatting options
 export function renderDate(
   date: Date,
   formatOptions: DateTimeFormatOptions
@@ -131,6 +147,8 @@ export function renderDate(
   return DateTime.fromJSDate(date).toLocaleString(formatOptions);
 }
 
+// renderDatedContent: render content strings when dates are to be included.
+//                     there are a lot of conditionals -- see scenarios chart below.
 // prettier-ignore
 export function renderDatedContent(
   date: string,
@@ -176,6 +194,11 @@ export function renderDatedContent(
                 : `${date}`     // date
 }
 
+// renderContent: render content strings when dates are not to be included.
+//                this function is considerably easier to reason about than renderDatedContent,
+//                so for now we'll keep it even though one function could handle both
+//                scenarios.
+// prettier-ignore
 export function renderContent(
   content: string | number,
   url: string | null,
@@ -188,17 +211,18 @@ export function renderContent(
     italicizeLink: false,
   }
 ): string {
-  let output = `${md && url ? '[' : ''}${
-    md && url && italicizeLink ? '_' : ''
-  }${title ? title : md ? 'item' : ''}${md && url && italicizeLink ? '_' : ''}${
-    md && url ? '](' + url + ')' : ''
-  }${content && content !== title ? `: ${content}` : ''}${
-    url && !md ? ' (' + url + ')' : ''
+  let output = `${md && url ? '[' : ''}${ md && url && italicizeLink ? '_' : ''               // hyperlink or italicize
+                  }${title ? title : md ? 'item' : ''                                           // content title, if needed
+                }${md && url && italicizeLink ? '_' : ''}${md && url ? '](' + url + ')' : ''  // close hyperlink or italicization
+                }${content && content !== title ? `: ${content}` : ''                         // content itself
+                }${url && !md ? ' (' + url + ')' : ''                                         // content url if requested for plaintext
   }`;
 
   return output;
 }
 
+// renderEventPropSetGroup: combine rendered text for one or more EventPropSet in EventPropSetGroup,
+//                          pluralizing if appropriate
 export function renderEventPropSetGroup(
   eventPropSets: EventPropSet[],
   {
@@ -300,6 +324,7 @@ export function renderEventPropSetGroup(
   return output as RenderedEventsTextSet;
 }
 
+// formatRenderedEventsTextSet: apply formatting to rendered EventPropSet, per config
 function formatRenderedEventsTextSet(
   rets: RenderedEventsTextSet,
   {
@@ -352,6 +377,7 @@ function formatRenderedEventsTextSet(
   return [dates, summary, ...content];
 }
 
+// formatContentLine: helper function to properly generate line of content depending on config
 function formatContentLine(content: string, indentation: string): string {
   let contentLines = content.split('\n');
 
@@ -362,6 +388,13 @@ function formatContentLine(content: string, indentation: string): string {
   return output;
 }
 
+// renderEvents: primary interface for naive-gh-events.
+//               - accepts collection of GHEvent objects and returns dated set of rendered events
+//               - accepts full range of NaiveConfig options
+//               - there's no particular reason to access any other function directly, unless
+//                 a user disagrees with how the overall process is implemented.
+//               - for complete overview of program flow initated by this interface,
+//                 please see the ./types file -- for a more general one, see README.md.
 export function renderEvents(
   events: GHEvent[],
   {

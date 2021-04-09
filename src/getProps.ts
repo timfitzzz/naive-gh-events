@@ -8,6 +8,9 @@ import {
 } from './eventTypes';
 const _ = require('lodash');
 
+// fixUrl: utility function that lets us correct API urls returnd by the GH API
+//         so that they match intended web URLs that can be used to produce
+//         clickable links.
 export function fixUrl(url: string): string | null {
   if (url.indexOf('[bot]') !== -1) {
     url = url.replace('[bot]', '').replace('/users', '/apps');
@@ -22,6 +25,8 @@ export function fixUrl(url: string): string | null {
     : null;
 }
 
+// lookupActionTypes: find the variations (action types) an EventType can be expected to have,
+//                    based on how they're defined in /eventTypes
 export function lookupActionTypes(
   event: GHEvent,
   itereeIdx?: number
@@ -33,26 +38,18 @@ export function lookupActionTypes(
 
     if (iterator && actionTypes) {
       if (itereeIdx) {
-        // console.log(`got itereeIdx`)
         let iteree = _.get(event, iterator)[itereeIdx];
-        // console.log(`got iteree: ${iteree}`)
-        // console.log("getting path ", actionPropPath[1])
-        // console.log(_.get(iteree, actionPropPath[1]))
         let output = [_.get(iteree, actionPropPath[1])];
         return output;
       } else {
         let types: string[] = _.get(event, iterator).map((iteree) =>
           _.get(iteree, actionPropPath[1])
         );
-        // console.log(types)
-        // .reduce((acc, i) => (acc.indexOf(i) ? acc + i : acc), [])
         return types;
       }
     } else if (actionPropPath) {
-      // console.log(_.get(event, actionPropPath))
       return [_.get(event, actionPropPath)];
     } else {
-      // console.log("actionTypes === null")
       return null;
     }
   } else {
@@ -60,11 +57,9 @@ export function lookupActionTypes(
   }
 }
 
-export function getVerbs<K extends GHEvent>(
-  event: K
-  // eventType: EventTypeRequirement<K> = undefined,
-  // iterantIndex: IterantIndexRequirement<K> = undefined
-): string[] {
+// getVerbs: get the correct verbs for the Event type depending on action type
+//           and whether the payload contains multiple event subjects
+export function getVerbs(event: GHEvent): string[] {
   if (event.type) {
     const typeMetadata: GithubEventType = EventTypes[event.type];
     const {
@@ -72,6 +67,9 @@ export function getVerbs<K extends GHEvent>(
       paths,
     } = typeMetadata;
 
+    // if the verb for this event type is a string, it won't vary,
+    // and we just need to return one copy for each event subject
+    // coming from this event.
     if (typeof paths.verb === 'string') {
       if (iterator) {
         const iterations = _.get(event, iterator);
@@ -80,7 +78,9 @@ export function getVerbs<K extends GHEvent>(
         return [paths.verb];
       }
     } else {
-      // if verb isn't a string, it's an object indexed by action type
+      // if verb isn't a string, it's an object indexed by action type,
+      // so we need to the appropriate verb for each event subject coming
+      // from this event.
       let actionTypes = lookupActionTypes(event);
 
       if (actionTypes) {
@@ -96,15 +96,13 @@ export function getVerbs<K extends GHEvent>(
   }
 }
 
+// getResultTexts: look up result verbiage based on event type and/or action type
 export function getResultTexts(
   eventType: string,
   actionType?: string | null
 ): [string, string] {
   const resultSet: resultDef | IndexedResultDef =
     EventTypes[eventType].paths.result;
-
-  // console.log(resultSet)
-  // console.log(EventTypes[eventType])
   if (Array.isArray(resultSet)) {
     return resultSet;
   } else if (actionType && resultSet[actionType]) {
@@ -114,12 +112,10 @@ export function getResultTexts(
   }
 }
 
+// getActorProps: get the actor props for an event
 export function getActorProps(event: GHEvent): { id: string; url: string } {
-  // console.log("getting actor for ", event.type)
-  // console.log(EventTypes[event.type])
   const actorPaths: GithubEventType['paths']['actor'] =
     EventTypes[event.type].paths.actor;
-  // console.log(actorPaths)
 
   if (actorPaths) {
     return {
@@ -137,11 +133,8 @@ export function getActorProps(event: GHEvent): { id: string; url: string } {
   }
 }
 
+// pathsToProps: get the props for an entity based on the provided paths
 function pathsToProps(obj: object, paths: EntityPaths): EntityProps {
-  // console.log(paths)
-  // paths.id === "page_name" && console.log("processing obj: ", obj)
-  // paths.id === "page_name" && console.log("getting paths ", paths)
-
   let url: string | undefined | null = paths.url
     ? fixUrl(_.get(obj, paths.url))
     : undefined;
@@ -156,10 +149,8 @@ function pathsToProps(obj: object, paths: EntityPaths): EntityProps {
   };
 }
 
-// goal: produce property sets for each subject within an event
+// getSubjectPropSets: get the subject prop sets from an Event, depending on action types
 export function getSubjectPropSets(event: GHEvent): EntityProps[] {
-  // console.log(event.type)
-  // console.log(EventTypes[event.type])
   const subjectPaths: EntityPaths | { [key: string]: EntityPaths } =
     EventTypes[event.type].paths.subject;
   const { iterator, actionTypes } = EventTypes[event.type].config;
@@ -169,9 +160,7 @@ export function getSubjectPropSets(event: GHEvent): EntityProps[] {
   if (subjectPaths) {
     if (iterator) {
       let subjects: GHEventPayloadIteree[] = _.get(event, iterator);
-      // console.log(subjects)
       output = subjects.map((subject, i) => {
-        // console.log(lookupActionTypes(event, i))
         return actionTypes && !subjectPaths.id
           ? pathsToProps(
               subject as object,
@@ -196,17 +185,14 @@ export function getSubjectPropSets(event: GHEvent): EntityProps[] {
   return output;
 }
 
+// getEntityProps: get the props for a specific entity from an event
 export function getEntityProps(
   event: GHEvent,
   entityType: string,
   actionType?: string
 ): EntityProps | undefined {
-  // console.dir(event.type + " " + entityType + " " + actionType)
   const entityPaths: EntityPaths | { [key: string]: EntityPaths } =
     EventTypes[event.type].paths[entityType];
-
-  // const { iterator } = EventTypes[event.type].config
-
   let output: EntityProps | undefined;
 
   if (entityPaths) {
@@ -226,6 +212,9 @@ export function getEntityProps(
   return output;
 }
 
+// getEventPropSets: primary interface for getting prop sets for an event.
+//                   accepts a GHEvent and returns the normalized collection of EventPropSets,
+//                   one per event subject.
 export function getEventPropSets(event: GHEvent): EventPropSet[] {
   let subjectPropSets = getSubjectPropSets(event);
   let subjectActionTypes = lookupActionTypes(event);
@@ -259,6 +248,7 @@ export function getEventPropSets(event: GHEvent): EventPropSet[] {
   });
 }
 
+// getEventsPropSets: primary interface for getting prop sets for an event, pluralized.
 export function getEventsPropSets(events: GHEvent[]): EventPropSet[] {
   return events.reduce(
     (acc, event) => acc.concat(getEventPropSets(event)),

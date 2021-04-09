@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
-import testData from './testData';
+import testData, { TestEvent } from './testData';
 import EventTypes, { GHEvent } from '../src/eventTypes';
 import {
   defaultNaiveConfig,
-  TestEvent,
   EventPropSet,
   SortedDatedEventCollections,
 } from '../src/types';
@@ -226,8 +225,6 @@ describe('sortEventPropSetGroups', () => {
       true
     );
 
-    // console.log(sortedEventPropSetGroups);
-
     sortedEventPropSetGroups.map((epsg, i, epsgs) => {
       if (i < epsgs.length - 1)
         expect(
@@ -250,8 +247,6 @@ describe('sortEventPropSetGroups', () => {
       'actor',
       false
     );
-
-    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].actor.id));
 
     sortedEventPropSetGroups.map((epsg, i, epsgs) => {
       if (i < epsgs.length - 1)
@@ -276,8 +271,6 @@ describe('sortEventPropSetGroups', () => {
       true
     );
 
-    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].actor.id));
-
     sortedEventPropSetGroups.map((epsg, i, epsgs) => {
       if (i < epsgs.length - 1)
         expect(
@@ -298,17 +291,11 @@ describe('sortEventPropSetGroups', () => {
       [testEventsSets[1].propSets[0]],
     ];
 
-    // console.dir(eventPropSetGroups.map((sepsg) => sepsg[0].target));
-
     let sortedEventPropSetGroups = sortEventPropSetGroups(
       [...eventPropSetGroups],
       'target',
       false
     );
-
-    // console.dir(
-    //   sortedEventPropSetGroups.map((sepsg) => JSON.stringify(sepsg[0].target))
-    // );
 
     sortedEventPropSetGroups.map((epsg, i, epsgs) => {
       if (
@@ -344,8 +331,6 @@ describe('sortEventPropSetGroups', () => {
       true
     );
 
-    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].target));
-
     sortedEventPropSetGroups.map((epsg, i, epsgs) => {
       if (
         i < epsgs.length - 1 &&
@@ -380,8 +365,6 @@ describe('sortEventPropSetGroups', () => {
       false
     );
 
-    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].parent));
-
     sortedEventPropSetGroups.map((epsg, i, epsgs) => {
       if (
         i < epsgs.length - 1 &&
@@ -415,8 +398,6 @@ describe('sortEventPropSetGroups', () => {
       'parent',
       true
     );
-
-    // console.dir(sortedEventPropSetGroups.map((sepsg) => sepsg[0].parent));
 
     sortedEventPropSetGroups.map((epsg, i, epsgs) => {
       if (
@@ -539,33 +520,8 @@ describe('getSortedDatedEventCollections sortBy and reverseSort functionality', 
         groupByDays: 365,
       });
 
-      // console.dir(JSON.stringify(sdecs));
-
-      // expect(sdecs[2].startDate.getTime()).toBeGreaterThanOrEqual(
-      //   sdecs[1].startDate.getTime()
-      // );
-      // expect(sdecs[1].startDate.getTime()).toBeGreaterThanOrEqual(
-      //   sdecs[0].startDate.getTime()
-      // );
-
-      // sdecs.forEach((sdec) => {
-      //   sdec.eventPropSetGroups.forEach((epsg, i) => {
-
-      //     if (i < sdec.eventPropSetGroups.length - 1) {
-      //       expect(epsg)
-      //     }
-      //     epsg.forEach((eps, i) => {
-      //       if (i < epsg.length - 1) {
-      //         expect(eps.type.localeCompare(epsg[i + 1].type)).toBe(-1)
-      //       }
-      //     });
-      //   });
-      // });
-
       sdecs[0].eventPropSetGroups.forEach((epsg, i, epsgs) => {
-        // console.dir(epsg[0]);
         if (i < epsgs.length - 1) {
-          // console.dir(epsg[0].type, epsgs[i + 1][0].type);
           expect(
             epsg[0].type.localeCompare(epsgs[i + 1][0].type)
           ).toBeGreaterThanOrEqual(0);
